@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Service.Interface
 {
-    public interface IAnnouncementService
+    public interface ICertificateService
     {
-        Task<List<Announcement>> GetAllAsync();
-        Task<Announcement> GetByIdAsync(int? id);
+        Task<List<Certificate>> GetAllAsync();
+        Task<Certificate> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
     }
 }

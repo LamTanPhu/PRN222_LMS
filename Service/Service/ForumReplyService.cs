@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly ForumReplyRepository forumReplyRepository;
 
-        public ForumReplyService(ForumReplyRepository forumReplyRepository)
+        public ForumReplyService()
         {
-            this.forumReplyRepository = forumReplyRepository;
+            forumReplyRepository = new ForumReplyRepository();
         }
 
         public async Task<List<ForumReply>> GetAllAsync()

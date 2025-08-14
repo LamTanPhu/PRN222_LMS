@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly CategoryRepository categoryRepository;
 
-        public CategoryService(CategoryRepository categoryRepository)
+        public CategoryService()
         {
-            this.categoryRepository = categoryRepository;
+            categoryRepository = new CategoryRepository();
         }
 
         public async Task<List<Category>> GetAllAsync()

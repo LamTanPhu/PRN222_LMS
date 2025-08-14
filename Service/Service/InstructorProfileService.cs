@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly InstructorProfileRepository instructorProfileRepository;
 
-        public InstructorProfileService(InstructorProfileRepository instructorProfileRepository)
+        public InstructorProfileService()
         {
-            this.instructorProfileRepository = instructorProfileRepository;
+            instructorProfileRepository = new InstructorProfileRepository();
         }
 
         public async Task<List<InstructorProfile>> GetAllAsync()

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Service.Interface
 {
-    public interface IOrderService
+    public interface IStudentQuizAttemptService
     {
-        Task<List<Order>> GetAllAsync();
-        Task<Order> GetByIdAsync(int? id);
+        Task<List<StudentQuizAttempt>> GetAllAsync();
+        Task<StudentQuizAttempt> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
     }
 }

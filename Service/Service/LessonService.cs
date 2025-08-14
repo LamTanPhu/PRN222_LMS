@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly LessonRepository lessonRepository;
 
-        public LessonService(LessonRepository lessonRepository)
+        public LessonService()
         {
-            this.lessonRepository = lessonRepository;
+            lessonRepository = new LessonRepository();
         }
 
         public async Task<List<Lesson>> GetAllAsync()

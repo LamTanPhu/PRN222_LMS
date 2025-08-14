@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Service.Interface
 {
-    public interface IOrderService
+    public interface IWishlistService
     {
-        Task<List<Order>> GetAllAsync();
-        Task<Order> GetByIdAsync(int? id);
+        Task<List<Wishlist>> GetAllAsync();
+        Task<Wishlist> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
     }
 }

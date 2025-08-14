@@ -13,9 +13,10 @@ namespace Service.Service
     {
         private readonly CertificateRepository certificateRepository;
 
-        public CertificateService(CertificateRepository certificateRepository)
+        public CertificateService()
         {
-            this.certificateRepository = certificateRepository;
+            certificateRepository = new CertificateRepository();
+
         }
 
         public async Task<List<Certificate>> GetAllAsync()

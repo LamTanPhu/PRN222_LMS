@@ -1,0 +1,42 @@
+﻿using Repository.Models;
+using Repository.Repositories;
+using Service.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Service.Service
+{
+    public class UserService : IUserService
+    {
+        private readonly UserRepository userRepository;
+
+
+        public UserService()
+        {
+            userRepository = new UserRepository();
+        }
+
+        public async Task<List<User>> GetAllAsync()
+        {
+            return await userRepository.GetAllAsync();
+        }
+
+        public async Task<User> GetByIdAsync(int? id)
+        {
+            return await userRepository.GetByIdAsync(id ?? 0);
+        }
+
+        public async Task<bool> DeleteAsync(int? id)
+        {
+            var user = await GetByIdAsync(id);
+            if (user != null)
+            {
+                return await userRepository.RemoveAsync(user);
+            }
+            return false;
+        }
+    }
+}

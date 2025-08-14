@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly EnrollmentRepository enrollmentRepository;
 
-        public EnrollmentService(EnrollmentRepository enrollmentRepository)
+        public EnrollmentService()
         {
-            this.enrollmentRepository = enrollmentRepository;
+            enrollmentRepository = new EnrollmentRepository();
         }
 
         public async Task<List<Enrollment>> GetAllAsync()

@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly CourseRepository courseRepository;
 
-        public CourseService(CourseRepository courseRepository)
+        public CourseService()
         {
-            this.courseRepository = courseRepository;
+            courseRepository = new CourseRepository();
         }
 
         public async Task<List<Course>> GetAllAsync()

@@ -11,9 +11,9 @@ namespace Service.Service
     {
         private readonly AnnouncementRepository announcementRepository;
 
-        public AnnouncementService(AnnouncementRepository announcementRepository)
+        public AnnouncementService()
         {
-            this.announcementRepository = announcementRepository;
+            announcementRepository = new AnnouncementRepository();
         }
 
         public async Task<List<Announcement>> GetAllAsync()

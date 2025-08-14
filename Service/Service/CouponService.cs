@@ -13,9 +13,9 @@ namespace Service.Service
     {
         private readonly CouponRepository couponRepository;
 
-        public CouponService(CouponRepository couponRepository)
+        public CouponService()
         {
-            this.couponRepository = couponRepository;
+            couponRepository = new CouponRepository();
         }
 
         public async Task<List<Coupon>> GetAllAsync()

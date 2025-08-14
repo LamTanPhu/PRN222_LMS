@@ -1,7 +1,3 @@
--- SQL Script for Coursera-Style Online Course Platform
--- Optimized for marketplace functionality with course reviews, categories, certificates, etc.
--- Database: SQL Server
-
 -- Create Database
 CREATE DATABASE CourseraStyleLMS;
 GO

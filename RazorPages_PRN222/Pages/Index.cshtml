@@ -1,10 +1,63 @@
 ﻿@page
-@model IndexModel
+@model RazorPages_PRN222.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Welcome to E-Learning";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <h1>Welcome to the E-Learning Platform</h1>
+
+    <!-- Featured Courses -->
+    <h2>Featured Courses</h2>
+    <div class="row">
+        @foreach (var course in Model.FeaturedCourses)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">@course.Title</h5>
+                        <p class="card-text">@(course.Description?.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)</p>
+                        <p>Category: @(course.Category?.Name ?? "N/A")</p>
+                        <p>Instructor: @(course.Instructor?.FullName ?? "N/A")</p>
+                        <a asp-page="/Courses/Details" asp-route-id="@course.CourseId" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Recent Announcements -->
+    <h2>Recent Announcements</h2>
+    <ul class="list-group mb-4">
+        @foreach (var announcement in Model.Announcements)
+        {
+            <li class="list-group-item">
+                <h5>@announcement.Title</h5>
+                <p>@announcement.Content</p>
+                <small>Posted by @(announcement.Author?.FullName ?? "N/A") on @announcement.PublishDate?.ToString("d")</small>
+            </li>
+        }
+    </ul>
+
+    <!-- Top Categories -->
+    <h2>Explore Categories</h2>
+    <div class="row">
+        @foreach (var category in Model.Categories)
+        {
+            <div class="col-md-3">
+                <a asp-page="/Courses/Index" asp-route-categoryId="@category.CategoryId" class="btn btn-outline-primary">@category.Name</a>
+            </div>
+        }
+    </div>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mt-3">
+            <a asp-page="/Admin/Index" class="btn btn-secondary">Manage Announcements</a>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

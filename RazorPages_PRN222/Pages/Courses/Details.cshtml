@@ -1,0 +1,15 @@
+﻿@page "{id}"
+@model RazorPages_PRN222.Pages.Courses.DetailsModel
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<div class="container mt-5">
+    <h1>Course Details</h1>
+    <nav>
+        <a asp-page="/Courses/Index" class="btn btn-secondary">Back to Courses</a>
+        <a asp-page="/Courses/Lessons" asp-route-id="@Model.CourseId" class="btn btn-info">Lessons</a>
+        <a asp-page="/Courses/Forums" asp-route-id="@Model.CourseId" class="btn btn-warning">Forums</a>
+        <a asp-page="/Courses/Quizzes" asp-route-id="@Model.CourseId" class="btn btn-success">Quizzes</a>
+    </nav>
+</div>

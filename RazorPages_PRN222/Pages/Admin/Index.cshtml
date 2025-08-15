@@ -1,0 +1,15 @@
+﻿@page
+@model RazorPages_PRN222.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-5">
+    <h1>Admin Dashboard</h1>
+    <nav>
+        <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
+        <a asp-page="/Admin/Courses" class="btn btn-info">Manage Courses</a>
+        <a asp-page="/Admin/Users" class="btn btn-warning">Manage Users</a>
+        <a asp-page="/Admin/Announcements" class="btn btn-success">Manage Announcements</a>
+    </nav>
+</div>

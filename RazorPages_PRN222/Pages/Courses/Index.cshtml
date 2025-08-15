@@ -1,0 +1,52 @@
+﻿@page "{categoryId?}"
+@model RazorPages_PRN222.Pages.Courses.IndexModel
+@{
+    ViewData["Title"] = "Courses";
+    var categoryItems = Model.Categories.Select(c => new SelectListItem { Value = c.CategoryId.ToString(), Text = c.Name }).ToList();
+}
+
+<div class="container mt-5">
+    <h1>Available Courses</h1>
+    <div class="mb-3">
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-page="/Courses/Create" class="btn btn-success">Add New Course</a>
+        }
+    </div>
+    <div class="mb-3">
+        <form method="get">
+            <select asp-items="categoryItems" asp-for="CategoryId" class="form-select" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+            </select>
+        </form>
+    </div>
+    <div class="row">
+        @foreach (var course in Model.Courses)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@course.Title</h5>
+                        <p class="card-text">@(course.Description?.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)</p>
+                        <p>Category: @(course.Category?.Name ?? "N/A")</p>
+                        <p>Instructor: @(course.Instructor?.FullName ?? "N/A")</p>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <form method="post" asp-page-handler="Enroll" asp-route-courseId="@course.CourseId">
+                                <button type="submit" class="btn btn-primary">Enroll</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-page="/Login" class="btn btn-secondary">Login to Enroll</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    @if (!Model.Courses.Any())
+    {
+        <p>No courses available.</p>
+    }
+</div>

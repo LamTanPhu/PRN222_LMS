@@ -1,0 +1,14 @@
+﻿@page
+@model RazorPages_PRN222.Pages.MyProfile.IndexModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-5">
+    <h1>My Profile</h1>
+    <nav>
+        <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
+        <a asp-page="/Courses/Index" class="btn btn-info">My Courses</a>
+        <a asp-page="/Checkout/Index" class="btn btn-warning">Checkout</a>
+    </nav>
+</div>

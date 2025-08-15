@@ -1,0 +1,32 @@
+﻿@page
+@model RazorPages_PRN222.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <h1>Login</h1>
+    <form method="post" class="mt-4">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="mb-3">
+            <label asp-for="Input.Email" class="form-label"></label>
+            <input asp-for="Input.Email" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Password" class="form-label"></label>
+            <input asp-for="Input.Password" class="form-control" type="password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+    <div>
+        <a asp-page="/Index">Back to Home</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

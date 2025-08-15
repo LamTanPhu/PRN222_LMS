@@ -80,5 +80,13 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task<User> LoginAsync(string email, string password)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
+        }
     }
 }

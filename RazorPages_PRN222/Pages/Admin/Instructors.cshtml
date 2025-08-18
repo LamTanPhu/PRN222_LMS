@@ -1,0 +1,35 @@
+﻿@page
+@model RazorPages_PRN222.Pages.Admin.InstructorsModel
+@{
+    ViewData["Title"] = "Manage Instructors";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+<div class="container">
+    <h1>Manage Instructors</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Instructor ID</th>
+                <th>Headline</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instructor in Model.Instructors)
+            {
+                <tr>
+                    <td>@instructor.InstructorId</td>
+                    <td>@instructor.Headline</td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@instructor.InstructorId" class="btn btn-primary btn-sm">Edit</a>
+                        <form asp-page-handler="Delete" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@instructor.InstructorId" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-page="./Create" class="btn btn-success">Add New Instructor</a>
+</div>

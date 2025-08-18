@@ -12,5 +12,8 @@ namespace Service.Interface
         Task<List<Course>> GetAllAsync();
         Task<Course> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Course course);
+        Task UpdateAsync(Course course);
+
     }
 }

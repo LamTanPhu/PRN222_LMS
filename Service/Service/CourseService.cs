@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(Course course)
+        {
+            await courseRepository.CreateAsync(course);
+        }
+
+        public async Task UpdateAsync(Course course)
+        {
+            await courseRepository.UpdateAsync(course);
+        }
     }
 }

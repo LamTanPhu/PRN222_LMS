@@ -35,5 +35,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(Announcement announcement)
+        {
+            await announcementRepository.CreateAsync(announcement);
+        }
+
+        public async Task UpdateAsync(Announcement announcement)
+        {
+            await announcementRepository.UpdateAsync(announcement);
+        }
     }
 }

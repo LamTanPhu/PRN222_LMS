@@ -12,5 +12,8 @@ namespace Service.Interface
         Task<List<Role>> GetAllAsync();
         Task<Role> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Role role);
+        Task UpdateAsync(Role role);
+
     }
 }

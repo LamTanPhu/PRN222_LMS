@@ -13,5 +13,8 @@ namespace Service.Interface
         Task<User> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
         Task<User> LoginAsync(string email, string password);
+        Task CreateAsync(User user);
+        Task UpdateAsync(User user);
+
     }
 }

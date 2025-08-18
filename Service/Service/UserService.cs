@@ -42,5 +42,16 @@ namespace Service.Service
             }
             return false;
         }
+
+
+        public async Task CreateAsync(User user)
+        {
+            await userRepository.CreateAsync(user);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            await userRepository.UpdateAsync(user);
+        }
     }
 }

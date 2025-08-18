@@ -12,5 +12,8 @@ namespace Service.Interface
         Task<List<Announcement>> GetAllAsync();
         Task<Announcement> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Announcement announcement);
+        Task UpdateAsync(Announcement announcement);
+
     }
 }

@@ -12,5 +12,8 @@ namespace Service.Interface
         Task<List<Category>> GetAllAsync();
         Task<Category> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Category category);
+        Task UpdateAsync(Category category);
+
     }
 }

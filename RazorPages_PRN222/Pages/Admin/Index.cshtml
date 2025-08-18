@@ -2,14 +2,21 @@
 @model RazorPages_PRN222.Pages.Admin.IndexModel
 @{
     ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container mt-5">
+
+<div class="container">
     <h1>Admin Dashboard</h1>
-    <nav>
-        <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
-        <a asp-page="/Admin/Courses" class="btn btn-info">Manage Courses</a>
-        <a asp-page="/Admin/Users" class="btn btn-warning">Manage Users</a>
-        <a asp-page="/Admin/Announcements" class="btn btn-success">Manage Announcements</a>
-    </nav>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Total Users: @Model.TotalUsers</h3>
+        </div>
+        <div class="col-md-4">
+            <h3>Total Courses: @Model.TotalCourses</h3>
+        </div>
+        <div class="col-md-4">
+            <h3>Total Announcements: @Model.TotalAnnouncements</h3>
+        </div>
+    </div>
 </div>

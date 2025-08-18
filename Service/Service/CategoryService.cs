@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(Category category)
+        {
+            await categoryRepository.CreateAsync(category);
+        }
+
+        public async Task UpdateAsync(Category category)
+        {
+            await categoryRepository.UpdateAsync(category);
+        }
     }
 }

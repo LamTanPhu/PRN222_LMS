@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(InstructorProfile profile)
+        {
+            await instructorProfileRepository.CreateAsync(profile);
+        }
+
+        public async Task UpdateAsync(InstructorProfile profile)
+        {
+            await instructorProfileRepository.UpdateAsync(profile);
+        }
     }
 }

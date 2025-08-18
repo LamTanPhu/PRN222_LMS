@@ -12,6 +12,7 @@ namespace Service.Service
     public class RoleService : IRoleService
     {
         private readonly RoleRepository roleRepository;
+
         public RoleService()
         {
             roleRepository = new RoleRepository();
@@ -35,6 +36,16 @@ namespace Service.Service
                 return await roleRepository.RemoveAsync(role);
             }
             return false;
+        }
+
+        public async Task CreateAsync(Role role)
+        {
+            await roleRepository.CreateAsync(role);
+        }
+
+        public async Task UpdateAsync(Role role)
+        {
+            await roleRepository.UpdateAsync(role);
         }
     }
 }

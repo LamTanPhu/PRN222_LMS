@@ -1,0 +1,151 @@
+﻿@page
+@model RazorPages_PRN222.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "Manage Users";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container">
+    <h1>Manage Users</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.UserId</td>
+                    <td>@user.Email</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserModal-@user.UserId">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal-@user.UserId">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Create">
+                    <div class="form-group">
+                        <label asp-for="NewUser.Username">Username</label>
+                        <input asp-for="NewUser.Username" class="form-control" />
+                        <span asp-validation-for="NewUser.Username" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewUser.Email">Email</label>
+                        <input asp-for="NewUser.Email" class="form-control" />
+                        <span asp-validation-for="NewUser.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewUser.PasswordHash">Password</label>
+                        <input asp-for="NewUser.PasswordHash" type="password" class="form-control" />
+                        <span asp-validation-for="NewUser.PasswordHash" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewUser.FullName">Full Name</label>
+                        <input asp-for="NewUser.FullName" class="form-control" />
+                        <span asp-validation-for="NewUser.FullName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewUser.RoleId">Role</label>
+                        <select asp-for="NewUser.RoleId" class="form-control" asp-items="Model.RoleOptions"></select>
+                        <span asp-validation-for="NewUser.RoleId" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal (Dynamic per User) -->
+@foreach (var user in Model.Users)
+{
+    <div class="modal fade" id="editUserModal-@user.UserId" tabindex="-1" aria-labelledby="editUserModalLabel-@user.UserId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel-@user.UserId">Edit User (ID: @user.UserId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@user.UserId">
+                        <input type="hidden" asp-for="@user.UserId" />
+                        <div class="form-group">
+                            <label asp-for="@user.Username">Username</label>
+                            <input asp-for="@user.Username" class="form-control" value="@user.Username" />
+                            <span asp-validation-for="@user.Username" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@user.Email">Email</label>
+                            <input asp-for="@user.Email" class="form-control" value="@user.Email" />
+                            <span asp-validation-for="@user.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@user.PasswordHash">Password</label>
+                            <input asp-for="@user.PasswordHash" type="password" class="form-control" value="@user.PasswordHash" />
+                            <span asp-validation-for="@user.PasswordHash" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@user.FullName">Full Name</label>
+                            <input asp-for="@user.FullName" class="form-control" value="@user.FullName" />
+                            <span asp-validation-for="@user.FullName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@user.RoleId">Role</label>
+                            <select asp-for="@user.RoleId" class="form-control" asp-items="Model.RoleOptions"></select>
+                            <span asp-validation-for="@user.RoleId" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete User Modal (Dynamic per User) -->
+@foreach (var user in Model.Users)
+{
+    <div class="modal fade" id="deleteUserModal-@user.UserId" tabindex="-1" aria-labelledby="deleteUserModalLabel-@user.UserId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel-@user.UserId">Delete User (ID: @user.UserId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete user '@user.Username' with ID @user.UserId?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@user.UserId" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

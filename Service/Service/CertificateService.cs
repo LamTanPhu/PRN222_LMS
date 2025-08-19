@@ -16,7 +16,6 @@ namespace Service.Service
         public CertificateService()
         {
             certificateRepository = new CertificateRepository();
-
         }
 
         public async Task<List<Certificate>> GetAllAsync()
@@ -37,6 +36,11 @@ namespace Service.Service
                 return await certificateRepository.RemoveAsync(certificate);
             }
             return false;
+        }
+
+        public async Task CreateAsync(Certificate certificate)
+        {
+            await certificateRepository.CreateAsync(certificate);
         }
     }
 }

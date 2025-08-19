@@ -37,5 +37,10 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(Enrollment enrollment)
+        {
+            await enrollmentRepository.CreateAsync(enrollment);
+        }
     }
 }

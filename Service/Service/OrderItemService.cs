@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(OrderItem orderItem)
+        {
+            await orderItemRepository.CreateAsync(orderItem);
+        }
+
+        public async Task UpdateAsync(OrderItem orderItem)
+        {
+            await orderItemRepository.UpdateAsync(orderItem);
+        }
     }
 }

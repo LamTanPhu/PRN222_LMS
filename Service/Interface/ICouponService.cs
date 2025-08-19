@@ -12,5 +12,6 @@ namespace Service.Interface
         Task<List<Coupon>> GetAllAsync();
         Task<Coupon> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task<Coupon> GetCouponByCodeAsync(string couponCode);
     }
 }

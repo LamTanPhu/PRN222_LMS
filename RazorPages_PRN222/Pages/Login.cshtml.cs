@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Service.Interface;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace RazorPages_PRN222.Pages
 {
@@ -44,6 +45,20 @@ namespace RazorPages_PRN222.Pages
             var user = await _userService.LoginAsync(Input.Email, Input.Password);
             if (user != null)
             {
+                // Create claims for the user
+                var claims = new List<Claim>
+                {
+                    new Claim("UserId", user.UserId.ToString()),
+                    new Claim("Email", user.Email),
+                    new Claim("FullName", user.FullName ?? ""),
+                    new Claim("Role", user.Role?.RoleName ?? "User")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync("Cookies", claimsPrincipal);
+
                 return RedirectToPage("/Index");
             }
 

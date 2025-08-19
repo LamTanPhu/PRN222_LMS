@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task CreateAsync(Forum forum)
+        {
+            await forumRepository.CreateAsync(forum);
+        }
+
+        public async Task UpdateAsync(Forum forum)
+        {
+            await forumRepository.UpdateAsync(forum);
+        }
     }
 }

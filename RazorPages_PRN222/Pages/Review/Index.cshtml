@@ -1,0 +1,171 @@
+@page "{courseId:int}"
+@model RazorPages_PRN222.Pages.Review.IndexModel
+@{
+    ViewData["Title"] = "Course Review";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Review: @Model.CourseTitle</h1>
+            
+            <!-- Create / Edit review -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>@(Model.EditingReview != null ? "Edit Review" : "Write a Review")</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.EditingReview != null)
+                    {
+                        <form method="post" asp-page-handler="UpdateReview">
+                            <input type="hidden" name="id" value="@Model.EditingReview.ReviewId" />
+                            <input type="hidden" name="courseId" value="@Model.CourseId" />
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <select class="form-select" id="rating" name="rating" required>
+                                    <option value="1" selected="@((Model.EditingReview?.Rating ?? 0) == 1)">⭐ Poor (1)</option>
+                                    <option value="2" selected="@((Model.EditingReview?.Rating ?? 0) == 2)">⭐⭐ Fair (2)</option>
+                                    <option value="3" selected="@((Model.EditingReview?.Rating ?? 0) == 3)">⭐⭐⭐ Good (3)</option>
+                                    <option value="4" selected="@((Model.EditingReview?.Rating ?? 0) == 4)">⭐⭐⭐⭐ Very Good (4)</option>
+                                    <option value="5" selected="@((Model.EditingReview?.Rating ?? 0) == 5)">⭐⭐⭐⭐⭐ Excellent (5)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewTitle" class="form-label">Review Title</label>
+                                <input type="text" class="form-control" id="reviewTitle" name="reviewTitle" value="@Model.EditingReview.ReviewTitle" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewText" class="form-label">Review Text</label>
+                                <textarea class="form-control" id="reviewText" name="reviewText" rows="4" required>@Model.EditingReview.ReviewText</textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a class="btn btn-secondary" asp-page="/Review/Index" asp-route-courseId="@Model.CourseId">Cancel</a>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="CreateReview">
+                            <input type="hidden" name="courseId" value="@Model.CourseId" />
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <select class="form-select" id="rating" name="rating" required>
+                                    <option value="">Select rating</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent (5)</option>
+                                    <option value="4">⭐⭐⭐⭐ Very Good (4)</option>
+                                    <option value="3">⭐⭐⭐ Good (3)</option>
+                                    <option value="2">⭐⭐ Fair (2)</option>
+                                    <option value="1">⭐ Poor (1)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewTitle" class="form-label">Review Title</label>
+                                <input type="text" class="form-control" id="reviewTitle" name="reviewTitle" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewText" class="form-label">Review Text</label>
+                                <textarea class="form-control" id="reviewText" name="reviewText" rows="4" 
+                                          placeholder="Share your experience with this course..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Existing reviews -->
+            @if (Model.CourseReviews.Any())
+            {
+                <h3>All Reviews (@Model.CourseReviews.Count)</h3>
+                @foreach (var review in Model.CourseReviews.OrderByDescending(r => r.ReviewDate))
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-0">@review.ReviewTitle</h6>
+                                    <p class="text-muted mb-1">@review.User.FullName</p>
+                                    <div class="text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <span>⭐</span>
+                                            }
+                                            else
+                                            {
+                                                <span>☆</span>
+                                            }
+                                        }
+                                        <span class="ms-2">(@review.Rating/5)</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">@review.ReviewDate?.ToString("MM/dd/yyyy")</small>
+                                    @if (User.Identity?.IsAuthenticated == true && (User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value == review.UserId.ToString() || User.IsInRole("Admin")))
+                                    {
+                                        <div class="btn-group btn-group-sm mt-1">
+                                            <a class="btn btn-outline-primary" asp-page-handler="EditReview" asp-route-id="@review.ReviewId" asp-route-courseId="@Model.CourseId">Edit</a>
+                                            <form method="post" asp-page-handler="DeleteReview" onsubmit="return confirm('Delete this review?');">
+                                                <input type="hidden" name="id" value="@review.ReviewId" />
+                                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                                <button type="submit" class="btn btn-outline-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <p class="card-text">@review.ReviewText</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p>No reviews yet. Be the first to review this course!</p>
+                </div>
+            }
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Course Information</h5>
+                </div>
+                <div class="card-body">
+                    <h6>@Model.CourseTitle</h6>
+                    <p class="text-muted">@Model.CourseDescription</p>
+                    
+                    @if (Model.AverageRating > 0)
+                    {
+                        <div class="mb-3">
+                            <h6>Average Rating</h6>
+                            <div class="text-warning">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Math.Round(Model.AverageRating))
+                                    {
+                                        <span>⭐</span>
+                                    }
+                                    else
+                                    {
+                                        <span>☆</span>
+                                    }
+                                }
+                                <span class="ms-2">(@Model.AverageRating.ToString("F1")/5)</span>
+                            </div>
+                            <small class="text-muted">@Model.CourseReviews.Count reviews</small>
+                        </div>
+                    }
+                    
+                    <a asp-page="/Courses/Learn" asp-route-courseId="@Model.CourseId" class="btn btn-primary btn-sm">
+                        Back to Course
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -6,8 +6,142 @@
 
 <div class="container mt-5">
     <h1>Checkout</h1>
-    <nav>
-        <a asp-page="/Courses/Index" class="btn btn-secondary">Back to Courses</a>
-        <a asp-page="/MyProfile/Index" class="btn btn-info">My Profile</a>
-    </nav>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CartItems.Any())
+                    {
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h6 class="mb-0">@item.Title</h6>
+                                    <small class="text-muted">@item.Category?.Name</small>
+                                </div>
+                                <span class="fw-bold">$@item.Price</span>
+                            </div>
+                        }
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span>$@Model.Subtotal</span>
+                        </div>
+                        @if (Model.DiscountAmount > 0)
+                        {
+                            <div class="d-flex justify-content-between text-success">
+                                <span>Discount:</span>
+                                <span>-$@Model.DiscountAmount</span>
+                            </div>
+                        }
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total:</span>
+                            <span>$@Model.TotalAmount</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Apply Coupon</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="ApplyCoupon">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="couponCode" 
+                                   placeholder="Enter coupon code" value="@Model.AppliedCoupon" />
+                            <button type="submit" class="btn btn-outline-primary">Apply</button>
+                        </div>
+                    </form>
+                    @if (!string.IsNullOrEmpty(Model.CouponMessage))
+                    {
+                        <div class="mt-2">
+                            <small class="@(Model.CouponMessage.Contains("successfully") ? "text-success" : "text-danger")">
+                                @Model.CouponMessage
+                            </small>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="ProcessPayment">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cardNumber" class="form-label">Card Number</label>
+                                <input type="text" class="form-control" id="cardNumber" name="cardNumber" 
+                                       placeholder="1234 5678 9012 3456" required />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiryDate" name="expiryDate" 
+                                       placeholder="MM/YY" required />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" name="cvv" 
+                                       placeholder="123" required />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cardholderName" class="form-label">Cardholder Name</label>
+                            <input type="text" class="form-control" id="cardholderName" name="cardholderName" 
+                                   placeholder="John Doe" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="billingAddress" class="form-label">Billing Address</label>
+                            <textarea class="form-control" id="billingAddress" name="billingAddress" 
+                                      rows="3" placeholder="Enter your billing address" required></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a asp-page="/Courses/Index" class="btn btn-secondary">Continue Shopping</a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-lock"></i> Pay $@Model.TotalAmount
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Order Summary Sidebar -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Items (@Model.CartItems.Count):</span>
+                        <span>$@Model.Subtotal</span>
+                    </div>
+                    @if (Model.DiscountAmount > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount:</span>
+                            <span>-$@Model.DiscountAmount</span>
+                        </div>
+                    }
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total:</span>
+                        <span>$@Model.TotalAmount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

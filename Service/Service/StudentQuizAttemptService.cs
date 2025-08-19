@@ -17,6 +17,7 @@ namespace Service.Service
         {
             studentQuizAttemptRepository = new StudentQuizAttemptRepository();
         }
+
         public async Task<List<StudentQuizAttempt>> GetAllAsync()
         {
             return await studentQuizAttemptRepository.GetAllAsync();
@@ -29,12 +30,17 @@ namespace Service.Service
 
         public async Task<bool> DeleteAsync(int? id)
         {
-            var studentQuizAttempt = await GetByIdAsync(id);
-            if (studentQuizAttempt != null)
+            var attempt = await GetByIdAsync(id);
+            if (attempt != null)
             {
-                return await studentQuizAttemptRepository.RemoveAsync(studentQuizAttempt);
+                return await studentQuizAttemptRepository.RemoveAsync(attempt);
             }
             return false;
+        }
+
+        public async Task CreateAsync(StudentQuizAttempt attempt)
+        {
+            await studentQuizAttemptRepository.CreateAsync(attempt);
         }
     }
 }

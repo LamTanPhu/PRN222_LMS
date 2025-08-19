@@ -1,0 +1,71 @@
+@page "{courseId:int}"
+@model RazorPages_PRN222.Pages.Certificate.IndexModel
+@{
+    ViewData["Title"] = "Course Certificate";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            @if (Model.Certificate != null)
+            {
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white text-center">
+                        <h2><i class="fas fa-certificate"></i> Certificate of Completion</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@Model.CourseTitle</h3>
+                        <p class="card-text">This is to certify that</p>
+                        <h4 class="text-primary">@Model.UserName</h4>
+                        <p class="card-text">has successfully completed the course</p>
+                        <p class="card-text"><strong>@Model.CourseTitle</strong></p>
+                        <p class="card-text">on @Model.Certificate.IssuedDate?.ToString("MMMM dd, yyyy")</p>
+                        
+                        <div class="mt-4">
+                            <p class="text-muted">Certificate ID: @Model.Certificate.CertificateId</p>
+                            <p class="text-muted">Certificate Code: @Model.Certificate.CertificateCode</p>
+                            <p class="text-muted">Course ID: @Model.CourseId</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-primary" onclick="window.print()">
+                                <i class="fas fa-print"></i> Print Certificate
+                            </button>
+                            <a asp-page="/Progress/Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Progress
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Certificate Not Available</h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <p>You need to complete the course and pass the final quiz to receive a certificate.</p>
+                        <div class="mt-3">
+                            <a asp-page="/Progress/Index" class="btn btn-primary">Check Progress</a>
+                            <a asp-page="/Quiz/Index" asp-route-courseId="@Model.CourseId" class="btn btn-info">Take Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn, .container .row:first-child {
+            display: none !important;
+        }
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+

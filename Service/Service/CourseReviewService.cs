@@ -30,12 +30,22 @@ namespace Service.Service
 
         public async Task<bool> DeleteAsync(int? id)
         {
-            var courseReview = await GetByIdAsync(id);
-            if (courseReview != null)
+            var review = await GetByIdAsync(id);
+            if (review != null)
             {
-                return await courseReviewRepository.RemoveAsync(courseReview);
+                return await courseReviewRepository.RemoveAsync(review);
             }
             return false;
+        }
+
+        public async Task CreateAsync(CourseReview review)
+        {
+            await courseReviewRepository.CreateAsync(review);
+        }
+
+        public async Task UpdateAsync(CourseReview review)
+        {
+            await courseReviewRepository.UpdateAsync(review);
         }
     }
 }

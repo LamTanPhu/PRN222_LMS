@@ -12,5 +12,6 @@ namespace Service.Interface
         Task<List<Certificate>> GetAllAsync();
         Task<Certificate> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Certificate certificate);
     }
 }

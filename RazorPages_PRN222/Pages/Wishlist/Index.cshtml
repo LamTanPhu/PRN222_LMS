@@ -1,0 +1,46 @@
+@page
+@model RazorPages_PRN222.Pages.Wishlist.IndexModel
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+
+<div class="container mt-5">
+    <h1>My Wishlist</h1>
+    
+    @if (Model.WishlistItems.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model.WishlistItems)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Course.Title</h5>
+                            <p class="card-text">@(item.Course.Description?.Length > 100 ? item.Course.Description.Substring(0, 100) + "..." : item.Course.Description)</p>
+                            <p class="card-text"><strong>Price: $@item.Course.Price</strong></p>
+                            <p class="card-text">Category: @(item.Course.Category?.Name ?? "N/A")</p>
+                            <p class="card-text">Instructor: @(item.Course.Instructor?.FullName ?? "N/A")</p>
+                            <div class="d-flex justify-content-between">
+                                <form method="post" asp-page-handler="RemoveFromWishlist" style="display: inline;">
+                                    <input type="hidden" name="courseId" value="@item.CourseId" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                                <form method="post" asp-page-handler="EnrollCourse" style="display: inline;">
+                                    <input type="hidden" name="courseId" value="@item.CourseId" />
+                                    <button type="submit" class="btn btn-success btn-sm">Enroll Now</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <p>Your wishlist is empty. <a asp-page="/Courses/Index">Browse courses</a> to add some!</p>
+        </div>
+    }
+</div>
+

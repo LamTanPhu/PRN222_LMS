@@ -50,9 +50,21 @@ namespace RazorPages_PRN222.Pages.Courses
             var course = await _courseService.GetByIdAsync(courseId);
             if (course == null) return Page();
 
-            // Enrollment logic here
+            // Enrollment logic here: add to a simple session cart to simulate purchase
+            var sessionKey = $"cart_{userId}";
+            var json = HttpContext.Session.GetString(sessionKey);
+            var courseIds = string.IsNullOrEmpty(json)
+                ? new List<int>()
+                : System.Text.Json.JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
 
-            return RedirectToPage("/Courses/Details", new { id = courseId });
+            if (!courseIds.Contains(courseId))
+            {
+                courseIds.Add(courseId);
+                HttpContext.Session.SetString(sessionKey, System.Text.Json.JsonSerializer.Serialize(courseIds));
+            }
+
+            // Redirect to checkout for demo flow
+            return RedirectToPage("/Checkout/Index");
         }
     }
 }

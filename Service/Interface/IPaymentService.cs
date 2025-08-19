@@ -12,5 +12,7 @@ namespace Service.Interface
         Task<List<Payment>> GetAllAsync();
         Task<Payment> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Payment payment);
+        Task UpdateAsync(Payment payment);
     }
 }

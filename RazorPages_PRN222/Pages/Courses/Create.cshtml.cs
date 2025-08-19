@@ -114,7 +114,7 @@ namespace RazorPages_PRN222.Pages.Courses
                         }
                     }
                 }
-            }
+            }   
 
             return RedirectToPage("/Admin/Courses");
         }

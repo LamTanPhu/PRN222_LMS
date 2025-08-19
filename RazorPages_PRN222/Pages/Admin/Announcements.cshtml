@@ -42,6 +42,7 @@
             </div>
             <div class="modal-body">
                 <form method="post" asp-page-handler="Create">
+                    <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="NewAnnouncement.Title">Title</label>
                         <input asp-for="NewAnnouncement.Title" class="form-control" />
@@ -58,8 +59,10 @@
                         <span asp-validation-for="NewAnnouncement.AnnouncementType" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="NewAnnouncement.AuthorId">Author ID</label>
-                        <input asp-for="NewAnnouncement.AuthorId" class="form-control" />
+                        <label asp-for="NewAnnouncement.AuthorId">Author</label>
+                        <select asp-for="NewAnnouncement.AuthorId" asp-items="Model.UserOptions" class="form-control">
+                            <option value="">Select an author</option>
+                        </select>
                         <span asp-validation-for="NewAnnouncement.AuthorId" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>

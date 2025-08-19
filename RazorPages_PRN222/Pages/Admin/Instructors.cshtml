@@ -42,9 +42,12 @@
             </div>
             <div class="modal-body">
                 <form method="post" asp-page-handler="Create">
+                    <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="NewInstructor.UserId">User ID</label>
-                        <input asp-for="NewInstructor.UserId" class="form-control" />
+                        <label asp-for="NewInstructor.UserId">User</label>
+                        <select asp-for="NewInstructor.UserId" asp-items="Model.UserOptions" class="form-control">
+                            <option value="">Select a user</option>
+                        </select>
                         <span asp-validation-for="NewInstructor.UserId" class="text-danger"></span>
                     </div>
                     <div class="form-group">

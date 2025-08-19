@@ -42,9 +42,20 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                await LoadData();
+                return Page();
+            }
             try
             {
+                var user = await userService.GetByIdAsync(NewInstructor.UserId);
+                if (user == null)
+                {
+                    ModelState.AddModelError("NewInstructor.UserId", "Invalid User ID.");
+                    await LoadData();
+                    return Page();
+                }
                 await instructorService.CreateAsync(NewInstructor);
                 await LoadData();
                 return Page();

@@ -4,6 +4,7 @@
     ViewData["Title"] = "Manage Categories";
     Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
+
 <div class="container">
     <h1>Manage Categories</h1>
     <table class="table">
@@ -21,15 +22,90 @@
                     <td>@category.CategoryId</td>
                     <td>@category.Name</td>
                     <td>
-                        <a asp-page="./Edit" asp-route-id="@category.CategoryId" class="btn btn-primary btn-sm">Edit</a>
-                        <form asp-page-handler="Delete" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@category.CategoryId" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal-@category.CategoryId">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal-@category.CategoryId">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a asp-page="./Create" class="btn btn-success">Add New Category</a>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
 </div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Create">
+                    <div class="form-group">
+                        <label asp-for="NewCategory.Name">Name</label>
+                        <input asp-for="NewCategory.Name" class="form-control" />
+                        <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+@foreach (var category in Model.Categories)
+{
+    <div class="modal fade" id="editCategoryModal-@category.CategoryId" tabindex="-1" aria-labelledby="editCategoryModalLabel-@category.CategoryId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel-@category.CategoryId">Edit Category (ID: @category.CategoryId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@category.CategoryId">
+                        <input type="hidden" asp-for="@Model.EditCategory.CategoryId" value="@category.CategoryId" />
+                        <div class="form-group">
+                            <label asp-for="@Model.EditCategory.Name">Name</label>
+                            <input asp-for="@Model.EditCategory.Name" class="form-control" value="@category.Name" />
+                            <span asp-validation-for="@Model.EditCategory.Name" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Category Modal -->
+@foreach (var category in Model.Categories)
+{
+    <div class="modal fade" id="deleteCategoryModal-@category.CategoryId" tabindex="-1" aria-labelledby="deleteCategoryModalLabel-@category.CategoryId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCategoryModalLabel-@category.CategoryId">Delete Category (ID: @category.CategoryId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete category with ID @category.CategoryId?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@category.CategoryId" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

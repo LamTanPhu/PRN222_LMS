@@ -28,7 +28,12 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task OnGetAsync()
         {
-            Users = await userService.GetAllAsync() ?? new List<User>();
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            Users = await userService.GetAllAsync() ?? new List<User>(); // Ensure no limit
             var roles = await roleService.GetAllAsync() ?? new List<Role>();
             RoleOptions = new SelectList(roles, "RoleId", "RoleName");
             NewUser = new User();
@@ -41,11 +46,13 @@ namespace RazorPages_PRN222.Pages.Admin
             try
             {
                 await userService.CreateAsync(NewUser);
-                return RedirectToPage();
+                await LoadData(); // Refresh with all records
+                return Page(); // Stay on page to show updated list
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Error creating user: " + ex.Message);
+                await LoadData(); // Refresh even on error
                 return Page();
             }
         }
@@ -58,18 +65,21 @@ namespace RazorPages_PRN222.Pages.Admin
                 var user = await userService.GetByIdAsync(id);
                 if (user != null)
                 {
-                    user.Username = EditUser.Username;
-                    user.Email = EditUser.Email;
-                    user.PasswordHash = EditUser.PasswordHash;
-                    user.FullName = EditUser.FullName;
-                    user.RoleId = EditUser.RoleId;
+                    // Use EditUser values directly for binding
+                    user.Username = EditUser.Username ?? user.Username;
+                    user.Email = EditUser.Email ?? user.Email;
+                    user.PasswordHash = EditUser.PasswordHash ?? user.PasswordHash;
+                    user.FullName = EditUser.FullName ?? user.FullName;
+                    user.RoleId = EditUser.RoleId != 0 ? EditUser.RoleId : user.RoleId; // Avoid unset role
                     await userService.UpdateAsync(user);
                 }
-                return RedirectToPage();
+                await LoadData(); // Refresh with all records
+                return Page(); // Stay on page to show updated list
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Error updating user: " + ex.Message);
+                await LoadData(); // Refresh even on error
                 return Page();
             }
         }
@@ -79,11 +89,13 @@ namespace RazorPages_PRN222.Pages.Admin
             try
             {
                 await userService.DeleteAsync(id);
-                return RedirectToPage();
+                await LoadData(); // Refresh with all records
+                return Page(); // Stay on page to show updated list
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, "Error deleting user: " + ex.Message);
+                await LoadData(); // Refresh even on error
                 return Page();
             }
         }

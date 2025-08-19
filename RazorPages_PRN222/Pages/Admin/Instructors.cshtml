@@ -77,10 +77,13 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" asp-page-handler="Edit" asp-route-id="@instructor.InstructorId">
+                        <div asp-validation-summary="All" class="text-danger"></div>
                         <input type="hidden" asp-for="@Model.EditInstructor.InstructorId" value="@instructor.InstructorId" />
                         <div class="form-group">
-                            <label asp-for="@Model.EditInstructor.UserId">User ID</label>
-                            <input asp-for="@Model.EditInstructor.UserId" class="form-control" value="@instructor.UserId" />
+                            <label asp-for="@Model.EditInstructor.UserId">User</label>
+                            <select asp-for="@Model.EditInstructor.UserId" asp-items="Model.UserOptions" class="form-control">
+                                <option value="">Select a user</option>
+                            </select>
                             <span asp-validation-for="@Model.EditInstructor.UserId" class="text-danger"></span>
                         </div>
                         <div class="form-group">

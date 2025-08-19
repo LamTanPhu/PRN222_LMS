@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Repository.Models;
 using Service.Interface;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RazorPages_PRN222.Pages.Admin
@@ -16,6 +17,7 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public List<Announcement> Announcements { get; set; } = new List<Announcement>();
         public SelectList UserOptions { get; set; }
+        public SelectList AnnouncementTypeOptions { get; set; }
         [BindProperty]
         public Announcement NewAnnouncement { get; set; }
         [BindProperty]
@@ -36,15 +38,33 @@ namespace RazorPages_PRN222.Pages.Admin
         {
             Announcements = await announcementService.GetAllAsync() ?? new List<Announcement>();
             var users = await userService.GetAllAsync() ?? new List<User>();
-            UserOptions = new SelectList(users, "UserId", "UserId"); // Adjust to display name if available
+            UserOptions = new SelectList(users, "UserId", "FullName");
+
+            // FIXED: Updated to match database constraint values exactly
+            AnnouncementTypeOptions = new SelectList(new[]
+            {
+                new { Value = "News", Text = "News" },
+                new { Value = "Event", Text = "Event" },
+                new { Value = "Update", Text = "Update" },
+                new { Value = "Promotion", Text = "Promotion" }
+            }, "Value", "Text");
+
             NewAnnouncement = new Announcement();
             EditAnnouncement = new Announcement();
         }
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
+            // ADDED: Validate AnnouncementType before ModelState check
+            if (string.IsNullOrEmpty(NewAnnouncement?.AnnouncementType))
+            {
+                ModelState.AddModelError("NewAnnouncement.AnnouncementType", "Please select an announcement type.");
+            }
+
             if (!ModelState.IsValid)
             {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
                 await LoadData();
                 return Page();
             }
@@ -63,7 +83,8 @@ namespace RazorPages_PRN222.Pages.Admin
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error creating announcement: " + ex.Message);
+                Console.WriteLine($"Create error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error creating announcement: {ex.Message}");
                 await LoadData();
                 return Page();
             }
@@ -71,22 +92,48 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
-            if (!ModelState.IsValid) return Page();
+            // ADDED: Validate AnnouncementType before ModelState check
+            if (string.IsNullOrEmpty(EditAnnouncement?.AnnouncementType))
+            {
+                ModelState.AddModelError("EditAnnouncement.AnnouncementType", "Please select an announcement type.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
+                await LoadData();
+                return Page();
+            }
             try
             {
                 var announcement = await announcementService.GetByIdAsync(id);
-                if (announcement != null)
+                if (announcement == null)
                 {
-                    announcement.Title = EditAnnouncement.Title ?? announcement.Title;
-                    announcement.Content = EditAnnouncement.Content ?? announcement.Content;
-                    await announcementService.UpdateAsync(announcement);
+                    ModelState.AddModelError(string.Empty, "Announcement not found.");
+                    await LoadData();
+                    return Page();
                 }
+                var user = await userService.GetByIdAsync(EditAnnouncement.AuthorId);
+                if (user == null)
+                {
+                    ModelState.AddModelError("EditAnnouncement.AuthorId", "Invalid Author ID.");
+                    await LoadData();
+                    return Page();
+                }
+                announcement.Title = EditAnnouncement.Title ?? announcement.Title;
+                announcement.Content = EditAnnouncement.Content ?? announcement.Content;
+                announcement.AnnouncementType = EditAnnouncement.AnnouncementType ?? announcement.AnnouncementType;
+                announcement.AuthorId = EditAnnouncement.AuthorId;
+                announcement.PublishDate = EditAnnouncement.PublishDate ?? announcement.PublishDate;
+                await announcementService.UpdateAsync(announcement);
                 await LoadData();
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error updating announcement: " + ex.Message);
+                Console.WriteLine($"Update error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error updating announcement: {ex.Message}");
                 await LoadData();
                 return Page();
             }
@@ -102,7 +149,8 @@ namespace RazorPages_PRN222.Pages.Admin
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error deleting announcement: " + ex.Message);
+                Console.WriteLine($"Delete error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error deleting announcement: {ex.Message}");
                 await LoadData();
                 return Page();
             }

@@ -50,7 +50,7 @@ namespace RazorPages_PRN222.Pages.Admin
             if (!ModelState.IsValid) return Page();
             try
             {
-                await courseService.CreateAsync(NewCourse);
+                //await courseService.CreateAsync(NewCourse);
                 await LoadData();
                 return Page();
             }

@@ -55,7 +55,13 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="NewAnnouncement.AnnouncementType">Type</label>
-                        <input asp-for="NewAnnouncement.AnnouncementType" class="form-control" />
+                        <select asp-for="NewAnnouncement.AnnouncementType" class="form-control">
+                            <option value="">Select a type</option>
+                            <option value="News">News</option>
+                            <option value="Event">Event</option>
+                            <option value="Update">Update</option>
+                            <option value="Promotion">Promotion</option>
+                        </select>
                         <span asp-validation-for="NewAnnouncement.AnnouncementType" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -64,6 +70,11 @@
                             <option value="">Select an author</option>
                         </select>
                         <span asp-validation-for="NewAnnouncement.AuthorId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.PublishDate">Publish Date</label>
+                        <input asp-for="NewAnnouncement.PublishDate" class="form-control" type="date" />
+                        <span asp-validation-for="NewAnnouncement.PublishDate" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
@@ -87,6 +98,7 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" asp-page-handler="Edit" asp-route-id="@announcement.AnnouncementId">
+                        <div asp-validation-summary="All" class="text-danger"></div>
                         <input type="hidden" asp-for="@Model.EditAnnouncement.AnnouncementId" value="@announcement.AnnouncementId" />
                         <div class="form-group">
                             <label asp-for="@Model.EditAnnouncement.Title">Title</label>
@@ -100,13 +112,33 @@
                         </div>
                         <div class="form-group">
                             <label asp-for="@Model.EditAnnouncement.AnnouncementType">Type</label>
-                            <input asp-for="@Model.EditAnnouncement.AnnouncementType" class="form-control" value="@announcement.AnnouncementType" />
+                            <select asp-for="@Model.EditAnnouncement.AnnouncementType" class="form-control">
+                                <option value="">Select a type</option>
+                                <option value="News" selected="@(announcement.AnnouncementType == "News")">News</option>
+                                <option value="Event" selected="@(announcement.AnnouncementType == "Event")">Event</option>
+                                <option value="Update" selected="@(announcement.AnnouncementType == "Update")">Update</option>
+                                <option value="Promotion" selected="@(announcement.AnnouncementType == "Promotion")">Promotion</option>
+                            </select>
                             <span asp-validation-for="@Model.EditAnnouncement.AnnouncementType" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <label asp-for="@Model.EditAnnouncement.AuthorId">Author ID</label>
-                            <input asp-for="@Model.EditAnnouncement.AuthorId" class="form-control" value="@announcement.AuthorId" />
+                            <label asp-for="@Model.EditAnnouncement.AuthorId">Author</label>
+                            <select asp-for="@Model.EditAnnouncement.AuthorId" class="form-control">
+                                <option value="">Select an author</option>
+                                @if (Model.UserOptions != null)
+                                {
+                                    @foreach (var user in Model.UserOptions)
+                                    {
+                                        <option value="@user.Value" selected="@(announcement.AuthorId.ToString() == user.Value)">@user.Text</option>
+                                    }
+                                }
+                            </select>
                             <span asp-validation-for="@Model.EditAnnouncement.AuthorId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.PublishDate">Publish Date</label>
+                            <input asp-for="@Model.EditAnnouncement.PublishDate" class="form-control" type="date" value="@announcement.PublishDate?.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="@Model.EditAnnouncement.PublishDate" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>

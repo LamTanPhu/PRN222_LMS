@@ -1,4 +1,107 @@
 ﻿@page
 @model RazorPages_PRN222.Pages.Courses.CreateModel
-@{
+@using Repository.Models
+<h2>Create a New Course</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="CourseVM.Title" class="control-label"></label>
+        <input asp-for="CourseVM.Title" class="form-control" />
+        <span asp-validation-for="CourseVM.Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CourseVM.Description" class="control-label"></label>
+        <textarea asp-for="CourseVM.Description" class="form-control"></textarea>
+        <span asp-validation-for="CourseVM.Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CourseVM.CategoryId" class="control-label">Category</label>
+        <select asp-for="CourseVM.CategoryId" class="form-control" asp-items="@(new SelectList(Model.Categories, nameof(Category.CategoryId), nameof(Category.Name), null))">
+            <option value="">Select a category</option>
+        </select>
+        <span asp-validation-for="CourseVM.CategoryId" class="text-danger"></span>
+    </div>
+
+    <h3>Lessons</h3>
+    <div id="lessons-container">
+        <div class="form-group lesson-group" data-lesson-index="0">
+            <label class="control-label">Lesson Title</label>
+            <input type="text" name="CourseVM.Lessons[0].Title" class="form-control" />
+            <label class="control-label">Lesson Content</label>
+            <textarea name="CourseVM.Lessons[0].Content" class="form-control"></textarea>
+            <h4>Quizzes for this Lesson</h4>
+            <div class="quizzes-container">
+                <div class="form-group quiz-group">
+                    <label class="control-label">Quiz Title</label>
+                    <input type="text" name="CourseVM.Lessons[0].Quizzes[0].Title" class="form-control" />
+                    <label class="control-label">Quiz Description</label>
+                    <textarea name="CourseVM.Lessons[0].Quizzes[0].Description" class="form-control"></textarea>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary add-quiz">Add Quiz</button>
+        </div>
+    </div>
+    <button type="button" id="add-lesson" class="btn btn-secondary">Add Lesson</button>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let lessonIndex = 1;
+
+        document.getElementById('add-lesson').addEventListener('click', () => {
+            const container = document.getElementById('lessons-container');
+            const newGroup = document.createElement('div');
+            newGroup.className = 'form-group lesson-group';
+            newGroup.setAttribute('data-lesson-index', lessonIndex);
+            newGroup.innerHTML = `
+                        <label class="control-label">Lesson Title</label>
+                        <input type="text" name="CourseVM.Lessons[${lessonIndex}].Title" class="form-control" />
+                        <label class="control-label">Lesson Content</label>
+                        <textarea name="CourseVM.Lessons[${lessonIndex}].Content" class="form-control"></textarea>
+                        <h4>Quizzes for this Lesson</h4>
+                        <div class="quizzes-container">
+                            <div class="form-group quiz-group">
+                                <label class="control-label">Quiz Title</label>
+                                <input type="text" name="CourseVM.Lessons[${lessonIndex}].Quizzes[0].Title" class="form-control" />
+                                <label class="control-label">Quiz Description</label>
+                                <textarea name="CourseVM.Lessons[${lessonIndex}].Quizzes[0].Description" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary add-quiz">Add Quiz</button>
+                        <button type="button" class="btn btn-danger remove-lesson">Remove Lesson</button>
+                    `;
+            container.appendChild(newGroup);
+            attachQuizEvent(newGroup);
+            newGroup.querySelector('.remove-lesson').addEventListener('click', () => newGroup.remove());
+            lessonIndex++;
+        });
+
+        function attachQuizEvent(lessonGroup) {
+            const lessonIdx = lessonGroup.getAttribute('data-lesson-index');
+            let quizIndex = 1;
+            lessonGroup.querySelector('.add-quiz').addEventListener('click', () => {
+                const quizzesContainer = lessonGroup.querySelector('.quizzes-container');
+                const newQuizGroup = document.createElement('div');
+                newQuizGroup.className = 'form-group quiz-group';
+                newQuizGroup.innerHTML = `
+                            <label class="control-label">Quiz Title</label>
+                            <input type="text" name="CourseVM.Lessons[${lessonIdx}].Quizzes[${quizIndex}].Title" class="form-control" />
+                            <label class="control-label">Quiz Description</label>
+                            <textarea name="CourseVM.Lessons[${lessonIdx}].Quizzes[${quizIndex}].Description" class="form-control"></textarea>
+                            <button type="button" class="btn btn-danger remove-quiz">Remove Quiz</button>
+                        `;
+                quizzesContainer.appendChild(newQuizGroup);
+                newQuizGroup.querySelector('.remove-quiz').addEventListener('click', () => newQuizGroup.remove());
+                quizIndex++;
+            });
+        }
+
+        // Attach quiz event to initial lesson
+        document.querySelectorAll('.lesson-group').forEach(attachQuizEvent);
+    </script>
 }

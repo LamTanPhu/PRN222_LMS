@@ -15,6 +15,9 @@ namespace Service.Interface
         Task<User> LoginAsync(string email, string password);
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
+        Task<User?> RegisterAsync(string fullName, string email, string password, string UserName);
+        Task<User?> GetByIdAsync(int id);
+        Task<User?> GetByEmailAsync(string email);
 
     }
 }

@@ -4,13 +4,14 @@
     ViewData["Title"] = "Manage Instructors";
     Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
+
 <div class="container">
     <h1>Manage Instructors</h1>
     <table class="table">
         <thead>
             <tr>
                 <th>Instructor ID</th>
-                <th>Headline</th>
+                <th>User ID</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -19,17 +20,102 @@
             {
                 <tr>
                     <td>@instructor.InstructorId</td>
-                    <td>@instructor.Headline</td>
+                    <td>@instructor.UserId</td>
                     <td>
-                        <a asp-page="./Edit" asp-route-id="@instructor.InstructorId" class="btn btn-primary btn-sm">Edit</a>
-                        <form asp-page-handler="Delete" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@instructor.InstructorId" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editInstructorModal-@instructor.InstructorId">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteInstructorModal-@instructor.InstructorId">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a asp-page="./Create" class="btn btn-success">Add New Instructor</a>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addInstructorModal">Add New Instructor</button>
 </div>
+
+<!-- Add Instructor Modal -->
+<div class="modal fade" id="addInstructorModal" tabindex="-1" aria-labelledby="addInstructorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addInstructorModalLabel">Add New Instructor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Create">
+                    <div class="form-group">
+                        <label asp-for="NewInstructor.UserId">User ID</label>
+                        <input asp-for="NewInstructor.UserId" class="form-control" />
+                        <span asp-validation-for="NewInstructor.UserId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewInstructor.Biography">Biography</label>
+                        <textarea asp-for="NewInstructor.Biography" class="form-control"></textarea>
+                        <span asp-validation-for="NewInstructor.Biography" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Instructor Modal -->
+@foreach (var instructor in Model.Instructors)
+{
+    <div class="modal fade" id="editInstructorModal-@instructor.InstructorId" tabindex="-1" aria-labelledby="editInstructorModalLabel-@instructor.InstructorId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editInstructorModalLabel-@instructor.InstructorId">Edit Instructor (ID: @instructor.InstructorId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@instructor.InstructorId">
+                        <input type="hidden" asp-for="@Model.EditInstructor.InstructorId" value="@instructor.InstructorId" />
+                        <div class="form-group">
+                            <label asp-for="@Model.EditInstructor.UserId">User ID</label>
+                            <input asp-for="@Model.EditInstructor.UserId" class="form-control" value="@instructor.UserId" />
+                            <span asp-validation-for="@Model.EditInstructor.UserId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditInstructor.Biography">Biography</label>
+                            <textarea asp-for="@Model.EditInstructor.Biography" class="form-control">@instructor.Biography</textarea>
+                            <span asp-validation-for="@Model.EditInstructor.Biography" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Instructor Modal -->
+@foreach (var instructor in Model.Instructors)
+{
+    <div class="modal fade" id="deleteInstructorModal-@instructor.InstructorId" tabindex="-1" aria-labelledby="deleteInstructorModalLabel-@instructor.InstructorId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteInstructorModalLabel-@instructor.InstructorId">Delete Instructor (ID: @instructor.InstructorId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete instructor with ID @instructor.InstructorId?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@instructor.InstructorId" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

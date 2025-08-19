@@ -17,40 +17,63 @@ namespace RazorPages_PRN222.Pages.Courses
         private readonly IInstructorProfileService _instructorProfileService;
         private readonly ILessonService _lessonService;
         private readonly IQuizService _quizService;
+        private readonly ILogger<CreateModel> _logger;
 
         [BindProperty]
-        public Course Course { get; set; }
-        public List<Category> Categories { get; set; }
-        public List<InstructorProfile> Instructors { get; set; }
         public CourseCreateViewModel CourseVM { get; set; }
+
+        public List<Category> Categories { get; set; }
 
         public CreateModel(
             ICourseService courseService,
             ICategoryService categoryService,
             IInstructorProfileService instructorProfileService,
             ILessonService lessonService,
-            IQuizService quizService)
+            IQuizService quizService,
+            ILogger<CreateModel> logger)
         {
-            _courseService = courseService;
-            _categoryService = categoryService;
-            _instructorProfileService = instructorProfileService;
-            _lessonService = lessonService;
-            _quizService = quizService;
+            _courseService = courseService ?? throw new ArgumentNullException(nameof(courseService));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
+            _instructorProfileService = instructorProfileService ?? throw new ArgumentNullException(nameof(instructorProfileService));
+            _lessonService = lessonService ?? throw new ArgumentNullException(nameof(lessonService));
+            _quizService = quizService ?? throw new ArgumentNullException(nameof(quizService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (!User.Identity.IsAuthenticated)
+            {
+                _logger.LogWarning("Unauthenticated user attempted to access /Courses/Create.");
+                return RedirectToPage("/Account/Login");
+            }
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                _logger.LogError("Invalid user ID claim: {UserIdClaim}", userIdClaim);
+                ModelState.AddModelError(string.Empty, "Invalid user ID. Please ensure you are logged in correctly.");
+                return Page();
+            }
+
             var instructorProfile = await _instructorProfileService.GetByIdAsync(userId);
             if (instructorProfile == null)
             {
-                return Forbid();
+                _logger.LogWarning("No instructor profile found for user ID: {UserId}", userId);
+                ModelState.AddModelError(string.Empty, "You must have an instructor profile to create a course.");
+                return Page();
             }
 
             Categories = await _categoryService.GetAllAsync();
-            if (Categories == null || Categories.Count == 0)
+            if (Categories == null)
             {
-                ModelState.AddModelError("", "No categories available. Please contact an administrator.");
+                _logger.LogError("Categories list is null from CategoryService.GetAllAsync.");
+                Categories = new List<Category>();
+            }
+            if (Categories.Count == 0)
+            {
+                _logger.LogWarning("No categories available in the database.");
+                ModelState.AddModelError(string.Empty, "No categories available. Please contact an administrator to add categories.");
                 return Page();
             }
 
@@ -61,9 +84,15 @@ namespace RazorPages_PRN222.Pages.Courses
         public async Task<IActionResult> OnPostAsync()
         {
             Categories = await _categoryService.GetAllAsync();
-            if (Categories == null || Categories.Count == 0)
+            if (Categories == null)
             {
-                ModelState.AddModelError("", "No categories available. Please contact an administrator.");
+                _logger.LogError("Categories list is null from CategoryService.GetAllAsync.");
+                Categories = new List<Category>();
+            }
+            if (Categories.Count == 0)
+            {
+                _logger.LogWarning("No categories available in the database.");
+                ModelState.AddModelError(string.Empty, "No categories available. Please contact an administrator to add categories.");
                 return Page();
             }
 
@@ -72,11 +101,26 @@ namespace RazorPages_PRN222.Pages.Courses
                 return Page();
             }
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (!User.Identity.IsAuthenticated)
+            {
+                _logger.LogWarning("Unauthenticated user attempted to post to /Courses/Create.");
+                return RedirectToPage("/Account/Login");
+            }
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                _logger.LogError("Invalid user ID claim: {UserIdClaim}", userIdClaim);
+                ModelState.AddModelError(string.Empty, "Invalid user ID. Please ensure you are logged in correctly.");
+                return Page();
+            }
+
             var instructorProfile = await _instructorProfileService.GetByIdAsync(userId);
             if (instructorProfile == null)
             {
-                return Forbid();
+                _logger.LogWarning("No instructor profile found for user ID: {UserId}", userId);
+                ModelState.AddModelError(string.Empty, "You must have an instructor profile to create a course.");
+                return Page();
             }
 
             // Create the course
@@ -88,7 +132,7 @@ namespace RazorPages_PRN222.Pages.Courses
             };
             var createdCourse = await _courseService.CreateAsync(course, instructorProfile.InstructorId);
 
-            // Create lessons
+            // Create lessons and their quizzes
             foreach (var lessonVM in CourseVM.Lessons)
             {
                 if (!string.IsNullOrEmpty(lessonVM.Title))
@@ -114,7 +158,7 @@ namespace RazorPages_PRN222.Pages.Courses
                         }
                     }
                 }
-            }   
+            }
 
             return RedirectToPage("/Admin/Courses");
         }

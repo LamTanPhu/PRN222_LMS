@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Repository.Models;
 using Service.Interface;
+using Service.Service;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -45,18 +46,36 @@ namespace RazorPages_PRN222.Pages.Admin
             EditCourse = new Course();
         }
 
-        public async Task<IActionResult> OnPostCreateAsync()
+        public async Task<IActionResult> OnPostCreateAsync(int id)
         {
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                await LoadData();
+                return Page();
+            }
+
             try
             {
-                //await courseService.CreateAsync(NewCourse);
+                var course = await courseService.GetByIdAsync(id);
+                if (course == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Course not found.");
+                    await LoadData();
+                    return Page();
+                }
+
+                course.Title = EditCourse.Title;
+                course.Description = EditCourse.Description;
+                course.InstructorId = EditCourse.InstructorId;
+                course.CategoryId = EditCourse.CategoryId;
+                await courseService.UpdateAsync(course);
+
                 await LoadData();
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error creating course: " + ex.Message);
+                ModelState.AddModelError(string.Empty, $"Error updating course: {ex.Message}");
                 await LoadData();
                 return Page();
             }

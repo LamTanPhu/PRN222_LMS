@@ -16,9 +16,18 @@
     </div>
     <div class="form-group">
         <label asp-for="CourseVM.CategoryId" class="control-label">Category</label>
-        <select asp-for="CourseVM.CategoryId" class="form-control" asp-items="@(new SelectList(Model.Categories, nameof(Category.CategoryId), nameof(Category.Name), null))">
-            <option value="">Select a category</option>
-        </select>
+        @if (Model.Categories?.Count > 0)
+        {
+            <select asp-for="CourseVM.CategoryId" class="form-control" asp-items="@(new SelectList(Model.Categories, nameof(Category.CategoryId), nameof(Category.Name)))">
+                <option value="">Select a category</option>
+            </select>
+        }
+        else
+        {
+            <select asp-for="CourseVM.CategoryId" class="form-control" disabled>
+                <option value="">No categories available</option>
+            </select>
+        }
         <span asp-validation-for="CourseVM.CategoryId" class="text-danger"></span>
     </div>
 
@@ -101,7 +110,6 @@
             });
         }
 
-        // Attach quiz event to initial lesson
         document.querySelectorAll('.lesson-group').forEach(attachQuizEvent);
     </script>
 }

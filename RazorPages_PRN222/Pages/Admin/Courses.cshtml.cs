@@ -69,6 +69,7 @@ namespace RazorPages_PRN222.Pages.Admin
                 course.InstructorId = EditCourse.InstructorId;
                 course.CategoryId = EditCourse.CategoryId;
                 await courseService.UpdateAsync(course);
+
                 await LoadData();
                 return Page();
             }

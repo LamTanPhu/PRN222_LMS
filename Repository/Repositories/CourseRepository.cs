@@ -52,10 +52,11 @@ namespace Repository.Repositories
                 .FirstOrDefaultAsync(c => c.CourseId == id);
         }
 
-        public async Task<int> CreateAsync(Course entity)
+        public async Task<Course> CreateAsync(Course entity)
         {
             _context.Courses.Add(entity);
-            return await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
         public async Task<int> UpdateAsync(Course entity)

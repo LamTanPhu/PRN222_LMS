@@ -1,5 +1,7 @@
 -- =============================================
 -- QUIZ TEST DATA SCRIPT
+-- File: Quiz_Test_Data.sql
+-- Purpose: Create test data for quiz functionality
 -- =============================================
 
 -- Clean up existing data

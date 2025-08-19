@@ -38,9 +38,11 @@ namespace Service.Service
             return false;
         }
 
-        public async Task CreateAsync(Course course)
+        public async Task<Course> CreateAsync(Course course, int id)
         {
+            course.InstructorId = id;
             await courseRepository.CreateAsync(course);
+            return course;
         }
 
         public async Task UpdateAsync(Course course)

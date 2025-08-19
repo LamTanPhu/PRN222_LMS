@@ -37,5 +37,12 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task<Lesson> CreateAsync(Lesson lesson, int courseId)
+        {
+            lesson.CourseId = courseId;
+            await lessonRepository.CreateAsync(lesson);
+            return lesson;
+        }
     }
 }

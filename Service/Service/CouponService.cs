@@ -37,5 +37,11 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task<Coupon> GetCouponByCodeAsync(string couponCode)
+        {
+            var allCoupons = await GetAllAsync();
+            return allCoupons.FirstOrDefault(c => c.CouponCode == couponCode);
+        }
     }
 }

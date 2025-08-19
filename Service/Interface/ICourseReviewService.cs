@@ -12,5 +12,7 @@ namespace Service.Interface
         Task<List<CourseReview>> GetAllAsync();
         Task<CourseReview> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(CourseReview review);
+        Task UpdateAsync(CourseReview review);
     }
 }

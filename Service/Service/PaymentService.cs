@@ -18,7 +18,6 @@ namespace Service.Service
             paymentRepository = new PaymentRepository();
         }
 
-
         public async Task<List<Payment>> GetAllAsync()
         {
             return await paymentRepository.GetAllAsync();
@@ -37,6 +36,16 @@ namespace Service.Service
                 return await paymentRepository.RemoveAsync(payment);
             }
             return false;
+        }
+
+        public async Task CreateAsync(Payment payment)
+        {
+            await paymentRepository.CreateAsync(payment);
+        }
+
+        public async Task UpdateAsync(Payment payment)
+        {
+            await paymentRepository.UpdateAsync(payment);
         }
     }
 }

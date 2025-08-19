@@ -12,5 +12,7 @@ namespace Service.Interface
         Task<List<OrderItem>> GetAllAsync();
         Task<OrderItem> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(OrderItem orderItem);
+        Task UpdateAsync(OrderItem orderItem);
     }
 }

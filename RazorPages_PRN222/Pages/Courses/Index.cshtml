@@ -32,9 +32,22 @@
                         <p>Instructor: @(course.Instructor?.FullName ?? "N/A")</p>
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
-                            <form method="post" asp-page-handler="Enroll" asp-route-courseId="@course.CourseId">
-                                <button type="submit" class="btn btn-primary">Enroll</button>
-                            </form>
+                            <div class="btn-group" role="group">
+                                <form method="post" asp-page-handler="Enroll" asp-route-courseId="@course.CourseId" style="display: inline;">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-graduation-cap"></i> Enroll
+                                    </button>
+                                </form>
+                                <a asp-page="/Wishlist/Index" asp-route-courseId="@course.CourseId" class="btn btn-outline-danger">
+                                    <i class="fas fa-heart"></i> Wishlist
+                                </a>
+                                <a asp-page="/Review/Index" asp-route-courseId="@course.CourseId" class="btn btn-outline-warning">
+                                    <i class="fas fa-star"></i> Review
+                                </a>
+                                <a asp-page="/Forum/Index" asp-route-courseId="@course.CourseId" class="btn btn-outline-info">
+                                    <i class="fas fa-comments"></i> Forum
+                                </a>
+                            </div>
                         }
                         else
                         {

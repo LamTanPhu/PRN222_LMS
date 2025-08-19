@@ -12,5 +12,7 @@ namespace Service.Interface
         Task<List<Forum>> GetAllAsync();
         Task<Forum> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task CreateAsync(Forum forum);
+        Task UpdateAsync(Forum forum);
     }
 }

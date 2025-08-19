@@ -26,6 +26,18 @@ namespace RazorPages_PRN222.Pages
 
         public async Task OnGetAsync()
         {
+            if (User.Claims.FirstOrDefault(c => c.Type == "Role") is null)
+                Response.Redirect("/Login");
+            else
+            switch (User.Claims.FirstOrDefault(c => c.Type == "Role")?.Value)
+            {
+                case "Admin":
+                    Response.Redirect("/Admin/Index");
+                    break;
+                case "Instructor":
+                    Response.Redirect("/Instructor/Index");
+                    break;
+            }
             FeaturedCourses = (await _courseService.GetAllAsync()).Take(6).ToList();
             Announcements = (await _announcementService.GetAllAsync())
                 .Where(a => a.IsActive ?? false)

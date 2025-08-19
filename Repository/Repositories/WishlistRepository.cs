@@ -20,6 +20,13 @@ namespace Repository.Repositories
         {
         }
 
+        public async Task<IList<Course>> GetByUserAsync(int userId)
+        {
+            return await _context.Wishlists
+                .Where(w => w.UserId == userId)
+                .Select(w => w.Course)
+                .ToListAsync();
+        }
         public async Task<List<Wishlist>> GetAllAsync()
         {
             return await _context.Wishlists
@@ -55,6 +62,12 @@ namespace Repository.Repositories
             _context.Wishlists.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> ExistsAsync(int userId, int courseId)
+        {
+            return await _context.Wishlists
+                .AnyAsync(w => w.UserId == userId && w.CourseId == courseId);
         }
     }
 }

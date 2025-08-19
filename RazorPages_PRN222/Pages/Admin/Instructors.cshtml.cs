@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Repository.Models;
 using Service.Interface;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -35,23 +36,37 @@ namespace RazorPages_PRN222.Pages.Admin
         {
             Instructors = await instructorService.GetAllAsync() ?? new List<InstructorProfile>();
             var users = await userService.GetAllAsync() ?? new List<User>();
-            UserOptions = new SelectList(users, "UserId", "UserId"); // Adjust to display name if available
+            UserOptions = new SelectList(users, "UserId", "FullName"); // Assuming User has FullName
             NewInstructor = new InstructorProfile();
             EditInstructor = new InstructorProfile();
         }
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
+                await LoadData();
+                return Page();
+            }
             try
             {
+                var user = await userService.GetByIdAsync(NewInstructor.UserId);
+                if (user == null)
+                {
+                    ModelState.AddModelError("NewInstructor.UserId", "Invalid User ID.");
+                    await LoadData();
+                    return Page();
+                }
                 await instructorService.CreateAsync(NewInstructor);
-                await LoadData();
+                await LoadData(); // Refresh data
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error creating instructor: " + ex.Message);
+                Console.WriteLine($"Create error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error creating instructor: {ex.Message}");
                 await LoadData();
                 return Page();
             }
@@ -59,23 +74,39 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
-            if (!ModelState.IsValid) return Page();
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
+                await LoadData();
+                return Page();
+            }
             try
             {
                 var instructor = await instructorService.GetByIdAsync(id);
-                if (instructor != null)
+                if (instructor == null)
                 {
-                    instructor.InstructorId = EditInstructor.InstructorId != 0 ? EditInstructor.InstructorId : instructor.InstructorId;
-                    instructor.UserId = EditInstructor.UserId != 0 ? EditInstructor.UserId : instructor.UserId;
-                    instructor.Biography = EditInstructor.Biography ?? instructor.Biography;
-                    await instructorService.UpdateAsync(instructor);
+                    ModelState.AddModelError(string.Empty, "Instructor not found.");
+                    await LoadData();
+                    return Page();
                 }
+                var user = await userService.GetByIdAsync(EditInstructor.UserId);
+                if (user == null)
+                {
+                    ModelState.AddModelError("EditInstructor.UserId", "Invalid User ID.");
+                    await LoadData();
+                    return Page();
+                }
+                instructor.UserId = EditInstructor.UserId;
+                instructor.Biography = EditInstructor.Biography ?? instructor.Biography;
+                await instructorService.UpdateAsync(instructor);
                 await LoadData();
                 return Page();
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error updating instructor: " + ex.Message);
+                Console.WriteLine($"Update error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error updating instructor: {ex.Message}");
                 await LoadData();
                 return Page();
             }
@@ -91,7 +122,8 @@ namespace RazorPages_PRN222.Pages.Admin
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "Error deleting instructor: " + ex.Message);
+                Console.WriteLine($"Delete error: {ex}");
+                ModelState.AddModelError(string.Empty, $"Error deleting instructor: {ex.Message}");
                 await LoadData();
                 return Page();
             }

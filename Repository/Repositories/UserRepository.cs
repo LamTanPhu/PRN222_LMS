@@ -87,5 +87,11 @@ namespace Repository.Repositories
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
         }
+        public async Task<List<User>> GetUsersByRoleAsync(string role)
+        {
+            return await _context.Users
+                .Where(u => u.Role.RoleName == role)
+                .ToListAsync() ?? new List<User>();
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace Service.Interface
         Task<User> LoginAsync(string email, string password);
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
+        Task<List<User>> GetUsersByRoleAsync(string role);
 
     }
 }

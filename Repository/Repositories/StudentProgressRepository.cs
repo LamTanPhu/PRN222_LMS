@@ -44,12 +44,31 @@ namespace Repository.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateAsync(StudentProgress entity)
+        public async Task UpdateAsync(int userId, int courseId, int lessonId, bool isCompleted)
         {
-            _context.ChangeTracker.Clear();
-            var tracker = _context.StudentProgresses.Attach(entity);
-            tracker.State = EntityState.Modified;
-            return await _context.SaveChangesAsync();
+            var progress = await _context.StudentProgresses
+                .FirstOrDefaultAsync(sp => sp.UserId == userId && sp.CourseId == courseId && sp.LessonId == lessonId);
+
+            if (progress == null)
+            {
+                progress = new StudentProgress
+                {
+                    UserId = userId,
+                    CourseId = courseId,
+                    LessonId = lessonId,
+                    IsCompleted = isCompleted,
+                    CompletedAt = isCompleted ? DateTime.UtcNow : null
+                };
+                _context.StudentProgresses.Add(progress);
+            }
+            else
+            {
+                progress.IsCompleted = isCompleted;
+                progress.CompletedAt = isCompleted ? DateTime.UtcNow : null;
+                _context.StudentProgresses.Update(progress);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> RemoveAsync(StudentProgress entity)
@@ -57,6 +76,14 @@ namespace Repository.Repositories
             _context.StudentProgresses.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
+        }
+        public async Task<List<StudentProgress>> GetStudentProgressesByUserAsync(int userId)
+        {
+            return await _context.StudentProgresses
+                .Include(sp => sp.Course)
+                .Include(sp => sp.Lesson)
+                .Where(sp => sp.UserId == userId)
+                .ToListAsync();
         }
     }
 }

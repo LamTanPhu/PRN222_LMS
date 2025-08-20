@@ -53,5 +53,10 @@ namespace Service.Service
         {
             await userRepository.UpdateAsync(user);
         }
+
+        public async Task<List<User>> GetUsersByRoleAsync(string role)
+        {
+            return await userRepository.GetUsersByRoleAsync(role);
+        }
     }
 }

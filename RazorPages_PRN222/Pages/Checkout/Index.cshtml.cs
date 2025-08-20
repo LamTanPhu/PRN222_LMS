@@ -89,7 +89,7 @@ namespace RazorPages_PRN222.Pages.Checkout
         }
 
         public async Task<IActionResult> OnPostProcessPaymentAsync(string cardNumber, string expiryDate, 
-                                                                  string cvv, string cardholderName, string billingAddress)
+                                                                  string cvv, string cardholderName)
         {
             if (!User.Identity?.IsAuthenticated ?? true)
             {

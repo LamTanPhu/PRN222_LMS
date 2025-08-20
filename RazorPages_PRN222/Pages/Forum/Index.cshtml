@@ -1,4 +1,4 @@
-@page "{courseId:int}"
+@page "{courseId:int?}"
 @model RazorPages_PRN222.Pages.Forum.IndexModel
 @{
     ViewData["Title"] = "Course Forum";
@@ -94,7 +94,7 @@
                         </div>
                         <div class="card-body">
                             <p class="card-text">@post.Content</p>
-                            <p class="text-muted">Posted by: @post.User.FullName</p>
+                            <p class="text-muted">Posted by: @(post.User?.FullName ?? "Unknown")</p>
                             @if (User.Identity?.IsAuthenticated == true && (User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value == post.UserId.ToString() || User.IsInRole("Admin")))
                             {
                                 <div class="btn-group btn-group-sm mb-2">
@@ -108,7 +108,7 @@
                             }
                             
                             <!-- Replies -->
-                            @if (post.ForumReplies.Any())
+                            @if (post.ForumReplies != null && post.ForumReplies.Any())
                             {
                                 <div class="mt-3">
                                     <h6>Replies:</h6>
@@ -117,7 +117,7 @@
                                         <div class="border-start border-2 ps-3 ms-3 mb-2">
                                             <p class="mb-1">@reply.Content</p>
                                             <small class="text-muted">
-                                                @reply.User.FullName - 
+                                                @(reply.User?.FullName ?? "Unknown") - 
                                                 @reply.ReplyDate?.ToString("MM/dd/yyyy HH:mm")
                                             </small>
                                             @if (User.Identity?.IsAuthenticated == true && (User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value == reply.UserId.ToString() || User.IsInRole("Admin")))

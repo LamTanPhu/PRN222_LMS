@@ -24,20 +24,24 @@ namespace RazorPages_PRN222.Pages.Review
         [BindProperty]
         public Repository.Models.CourseReview EditingReview { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int courseId)
+        public async Task<IActionResult> OnGetAsync(int? courseId)
         {
             if (!User.Identity?.IsAuthenticated ?? true)
             {
                 return RedirectToPage("/Login");
             }
 
-            CourseId = courseId;
+            if (courseId == null)
+            {
+                return RedirectToPage("/Courses/Index");
+            }
+            CourseId = courseId.Value;
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 return RedirectToPage("/Login");
 
             // Get course information
-            var course = await _courseService.GetByIdAsync(courseId);
+            var course = await _courseService.GetByIdAsync(CourseId);
             if (course == null)
             {
                 return NotFound();
@@ -47,7 +51,7 @@ namespace RazorPages_PRN222.Pages.Review
 
             // Get reviews for this course
             var allReviews = await _reviewService.GetAllAsync();
-            CourseReviews = allReviews.Where(r => r.CourseId == courseId).ToList();
+            CourseReviews = allReviews.Where(r => r.CourseId == CourseId).ToList();
 
             // Calculate average rating
             if (CourseReviews.Any())

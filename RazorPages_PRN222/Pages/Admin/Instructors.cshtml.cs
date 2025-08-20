@@ -5,6 +5,7 @@ using Repository.Models;
 using Service.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RazorPages_PRN222.Pages.Admin
@@ -43,6 +44,13 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task<IActionResult> OnPostCreateAsync()
         {
+            // Remove validation for fields that should be auto-generated or have defaults
+            ModelState.Remove("NewInstructor.InstructorId"); // Auto-generated
+            ModelState.Remove("NewInstructor.TotalStudents"); // Has default
+            ModelState.Remove("NewInstructor.AverageRating"); // Has default  
+            ModelState.Remove("NewInstructor.TotalCourses"); // Has default
+            ModelState.Remove("NewInstructor.User"); // Navigation property
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
@@ -50,8 +58,10 @@ namespace RazorPages_PRN222.Pages.Admin
                 await LoadData();
                 return Page();
             }
+
             try
             {
+                // Validate user exists
                 var user = await userService.GetByIdAsync(NewInstructor.UserId);
                 if (user == null)
                 {
@@ -59,9 +69,28 @@ namespace RazorPages_PRN222.Pages.Admin
                     await LoadData();
                     return Page();
                 }
+
+                // Check if instructor profile already exists for this user
+                var existingInstructors = await instructorService.GetAllAsync();
+                if (existingInstructors.Any(i => i.UserId == NewInstructor.UserId))
+                {
+                    ModelState.AddModelError("NewInstructor.UserId", "An instructor profile already exists for this user.");
+                    await LoadData();
+                    return Page();
+                }
+
+                // Set default values explicitly (in case they're not being set properly)
+                NewInstructor.TotalStudents = NewInstructor.TotalStudents ?? 0;
+                NewInstructor.AverageRating = NewInstructor.AverageRating ?? 0.00m;
+                NewInstructor.TotalCourses = NewInstructor.TotalCourses ?? 0;
+
+                // Don't set InstructorId - let it be auto-generated
+                NewInstructor.InstructorId = 0;
+
                 await instructorService.CreateAsync(NewInstructor);
-                await LoadData(); // Refresh data
-                return Page();
+
+                // Redirect to avoid form resubmission
+                return RedirectToPage();
             }
             catch (Exception ex)
             {
@@ -74,6 +103,10 @@ namespace RazorPages_PRN222.Pages.Admin
 
         public async Task<IActionResult> OnPostEditAsync(int id)
         {
+            // Remove validation for auto-generated and navigation properties
+            ModelState.Remove("EditInstructor.InstructorId");
+            ModelState.Remove("EditInstructor.User");
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
@@ -81,6 +114,7 @@ namespace RazorPages_PRN222.Pages.Admin
                 await LoadData();
                 return Page();
             }
+
             try
             {
                 var instructor = await instructorService.GetByIdAsync(id);
@@ -90,6 +124,7 @@ namespace RazorPages_PRN222.Pages.Admin
                     await LoadData();
                     return Page();
                 }
+
                 var user = await userService.GetByIdAsync(EditInstructor.UserId);
                 if (user == null)
                 {
@@ -97,11 +132,29 @@ namespace RazorPages_PRN222.Pages.Admin
                     await LoadData();
                     return Page();
                 }
+
+                // Check if another instructor already has this UserId (excluding current instructor)
+                var existingInstructors = await instructorService.GetAllAsync();
+                if (existingInstructors.Any(i => i.UserId == EditInstructor.UserId && i.InstructorId != id))
+                {
+                    ModelState.AddModelError("EditInstructor.UserId", "An instructor profile already exists for this user.");
+                    await LoadData();
+                    return Page();
+                }
+
+                // Update only the fields that should be updated
                 instructor.UserId = EditInstructor.UserId;
                 instructor.Biography = EditInstructor.Biography ?? instructor.Biography;
+                instructor.Headline = EditInstructor.Headline ?? instructor.Headline;
+                instructor.Website = EditInstructor.Website ?? instructor.Website;
+                instructor.LinkedInProfile = EditInstructor.LinkedInProfile ?? instructor.LinkedInProfile;
+                instructor.TwitterHandle = EditInstructor.TwitterHandle ?? instructor.TwitterHandle;
+                instructor.YearsOfExperience = EditInstructor.YearsOfExperience ?? instructor.YearsOfExperience;
+
                 await instructorService.UpdateAsync(instructor);
-                await LoadData();
-                return Page();
+
+                // Redirect to avoid form resubmission
+                return RedirectToPage();
             }
             catch (Exception ex)
             {
@@ -117,8 +170,9 @@ namespace RazorPages_PRN222.Pages.Admin
             try
             {
                 await instructorService.DeleteAsync(id);
-                await LoadData();
-                return Page();
+
+                // Redirect to avoid form resubmission
+                return RedirectToPage();
             }
             catch (Exception ex)
             {

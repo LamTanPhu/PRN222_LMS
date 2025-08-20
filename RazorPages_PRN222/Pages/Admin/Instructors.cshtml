@@ -7,11 +7,26 @@
 
 <div class="container">
     <h1>Manage Instructors</h1>
-    <table class="table">
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Instructor ID</th>
-                <th>User ID</th>
+                <th>User Name</th>
+                <th>Biography</th>
+                <th>Years of Experience</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -20,7 +35,9 @@
             {
                 <tr>
                     <td>@instructor.InstructorId</td>
-                    <td>@instructor.UserId</td>
+                    <td>@(instructor.User?.FullName ?? "N/A")</td>
+                    <td>@(string.IsNullOrEmpty(instructor.Biography) ? "No biography" : (instructor.Biography.Length > 50 ? instructor.Biography.Substring(0, 50) + "..." : instructor.Biography))</td>
+                    <td>@(instructor.YearsOfExperience?.ToString() ?? "N/A")</td>
                     <td>
                         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editInstructorModal-@instructor.InstructorId">Edit</button>
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteInstructorModal-@instructor.InstructorId">Delete</button>
@@ -34,7 +51,7 @@
 
 <!-- Add Instructor Modal -->
 <div class="modal fade" id="addInstructorModal" tabindex="-1" aria-labelledby="addInstructorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addInstructorModalLabel">Add New Instructor</h5>
@@ -42,24 +59,69 @@
             </div>
             <div class="modal-body">
                 <form method="post" asp-page-handler="Create">
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="NewInstructor.UserId">User</label>
-                        <select asp-for="NewInstructor.UserId" asp-items="Model.UserOptions" class="form-control">
-                            <option value="">Select a user</option>
-                        </select>
-                        <span asp-validation-for="NewInstructor.UserId" class="text-danger"></span>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="NewInstructor.UserId" class="form-label">User *</label>
+                                <select asp-for="NewInstructor.UserId" asp-items="Model.UserOptions" class="form-select" required>
+                                    <option value="">Select a user</option>
+                                </select>
+                                <span asp-validation-for="NewInstructor.UserId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="NewInstructor.YearsOfExperience" class="form-label">Years of Experience</label>
+                                <input asp-for="NewInstructor.YearsOfExperience" class="form-control" type="number" min="0" max="50" />
+                                <span asp-validation-for="NewInstructor.YearsOfExperience" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="NewInstructor.Biography">Biography</label>
-                        <textarea asp-for="NewInstructor.Biography" class="form-control"></textarea>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="NewInstructor.Headline" class="form-label">Headline</label>
+                        <input asp-for="NewInstructor.Headline" class="form-control" maxlength="255" />
+                        <span asp-validation-for="NewInstructor.Headline" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="NewInstructor.Biography" class="form-label">Biography</label>
+                        <textarea asp-for="NewInstructor.Biography" class="form-control" rows="4"></textarea>
                         <span asp-validation-for="NewInstructor.Biography" class="text-danger"></span>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save</button>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="NewInstructor.Website" class="form-label">Website</label>
+                                <input asp-for="NewInstructor.Website" class="form-control" type="url" maxlength="500" />
+                                <span asp-validation-for="NewInstructor.Website" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="NewInstructor.LinkedInProfile" class="form-label">LinkedIn Profile</label>
+                                <input asp-for="NewInstructor.LinkedInProfile" class="form-control" type="url" maxlength="500" />
+                                <span asp-validation-for="NewInstructor.LinkedInProfile" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="NewInstructor.TwitterHandle" class="form-label">Twitter Handle</label>
+                        <input asp-for="NewInstructor.TwitterHandle" class="form-control" maxlength="100" placeholder="" />
+                        <span asp-validation-for="NewInstructor.TwitterHandle" class="text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Instructor</button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -69,7 +131,7 @@
 @foreach (var instructor in Model.Instructors)
 {
     <div class="modal fade" id="editInstructorModal-@instructor.InstructorId" tabindex="-1" aria-labelledby="editInstructorModalLabel-@instructor.InstructorId" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editInstructorModalLabel-@instructor.InstructorId">Edit Instructor (ID: @instructor.InstructorId)</h5>
@@ -77,25 +139,69 @@
                 </div>
                 <div class="modal-body">
                     <form method="post" asp-page-handler="Edit" asp-route-id="@instructor.InstructorId">
-                        <div asp-validation-summary="All" class="text-danger"></div>
-                        <input type="hidden" asp-for="@Model.EditInstructor.InstructorId" value="@instructor.InstructorId" />
-                        <div class="form-group">
-                            <label asp-for="@Model.EditInstructor.UserId">User</label>
-                            <select asp-for="@Model.EditInstructor.UserId" asp-items="Model.UserOptions" class="form-control">
-                                <option value="">Select a user</option>
-                            </select>
-                            <span asp-validation-for="@Model.EditInstructor.UserId" class="text-danger"></span>
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="@Model.EditInstructor.UserId" class="form-label">User *</label>
+                                    <select asp-for="@Model.EditInstructor.UserId" asp-items="Model.UserOptions" class="form-select" required>
+                                        <option value="">Select a user</option>
+                                    </select>
+                                    <span asp-validation-for="@Model.EditInstructor.UserId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="@Model.EditInstructor.YearsOfExperience" class="form-label">Years of Experience</label>
+                                    <input asp-for="@Model.EditInstructor.YearsOfExperience" class="form-control" type="number" min="0" max="50" value="@instructor.YearsOfExperience" />
+                                    <span asp-validation-for="@Model.EditInstructor.YearsOfExperience" class="text-danger"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="@Model.EditInstructor.Biography">Biography</label>
-                            <textarea asp-for="@Model.EditInstructor.Biography" class="form-control">@instructor.Biography</textarea>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.EditInstructor.Headline" class="form-label">Headline</label>
+                            <input asp-for="@Model.EditInstructor.Headline" class="form-control" maxlength="255" value="@instructor.Headline" />
+                            <span asp-validation-for="@Model.EditInstructor.Headline" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.EditInstructor.Biography" class="form-label">Biography</label>
+                            <textarea asp-for="@Model.EditInstructor.Biography" class="form-control" rows="4">@instructor.Biography</textarea>
                             <span asp-validation-for="@Model.EditInstructor.Biography" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="@Model.EditInstructor.Website" class="form-label">Website</label>
+                                    <input asp-for="@Model.EditInstructor.Website" class="form-control" type="url" maxlength="500" value="@instructor.Website" />
+                                    <span asp-validation-for="@Model.EditInstructor.Website" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="@Model.EditInstructor.LinkedInProfile" class="form-label">LinkedIn Profile</label>
+                                    <input asp-for="@Model.EditInstructor.LinkedInProfile" class="form-control" type="url" maxlength="500" value="@instructor.LinkedInProfile" />
+                                    <span asp-validation-for="@Model.EditInstructor.LinkedInProfile" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="@Model.EditInstructor.TwitterHandle" class="form-label">Twitter Handle</label>
+                            <input asp-for="@Model.EditInstructor.TwitterHandle" class="form-control" maxlength="100" placeholder="" value="@instructor.TwitterHandle" />
+                            <span asp-validation-for="@Model.EditInstructor.TwitterHandle" class="text-danger"></span>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -109,11 +215,12 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteInstructorModalLabel-@instructor.InstructorId">Delete Instructor (ID: @instructor.InstructorId)</h5>
+                    <h5 class="modal-title" id="deleteInstructorModalLabel-@instructor.InstructorId">Delete Instructor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete instructor with ID @instructor.InstructorId?
+                    <p>Are you sure you want to delete the instructor profile for <strong>@(instructor.User?.FullName ?? "Unknown User")</strong>?</p>
+                    <p><small class="text-muted">This action cannot be undone.</small></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

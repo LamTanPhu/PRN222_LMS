@@ -16,6 +16,9 @@ namespace Service.Interface
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task<List<User>> GetUsersByRoleAsync(string role);
+        Task<User?> RegisterAsync(string fullName, string email, string password, string UserName);
+        Task<User?> GetByIdAsync(int id);
+        Task<User?> GetByEmailAsync(string email);
 
     }
 }

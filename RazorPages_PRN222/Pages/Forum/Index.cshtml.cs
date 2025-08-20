@@ -27,20 +27,25 @@ namespace RazorPages_PRN222.Pages.Forum
         [BindProperty]
         public Repository.Models.ForumReply EditingReply { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int courseId)
+        public async Task<IActionResult> OnGetAsync(int? courseId)
         {
             if (!User.Identity?.IsAuthenticated ?? true)
             {
                 return RedirectToPage("/Login");
             }
 
-            CourseId = courseId;
+            if (courseId == null)
+            {
+                // Graceful fallback: redirect to course list if no courseId
+                return RedirectToPage("/Courses/Index");
+            }
+            CourseId = courseId.Value;
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 return RedirectToPage("/Login");
 
             // Get course information
-            var course = await _courseService.GetByIdAsync(courseId);
+            var course = await _courseService.GetByIdAsync(CourseId);
             if (course == null)
             {
                 return NotFound();
@@ -50,7 +55,7 @@ namespace RazorPages_PRN222.Pages.Forum
 
             // Get forum posts for this course
             var allForums = await _forumService.GetAllAsync();
-            ForumPosts = allForums.Where(f => f.CourseId == courseId).ToList();
+            ForumPosts = allForums.Where(f => f.CourseId == CourseId).ToList();
 
             return Page();
         }

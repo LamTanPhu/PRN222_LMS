@@ -172,6 +172,23 @@ namespace RazorPages_PRN222.Pages.Checkout
             TotalAmount = Subtotal - DiscountAmount;
         }
 
+        public async Task<IActionResult> OnPostRemoveItemAsync(int courseId)
+        {
+            if (!User.Identity?.IsAuthenticated ?? true) return RedirectToPage("/Login");
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            var sessionKey = $"cart_{userIdClaim}";
+            var json = HttpContext.Session.GetString(sessionKey);
+            var ids = string.IsNullOrEmpty(json) ? new List<int>() : System.Text.Json.JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
+            if (ids.Contains(courseId))
+            {
+                ids.Remove(courseId);
+                HttpContext.Session.SetString(sessionKey, System.Text.Json.JsonSerializer.Serialize(ids));
+            }
+            CartItems = await GetCartItemsAsync();
+            CalculateTotals();
+            return Page();
+        }
+
         private async Task<List<Course>> GetCartItemsAsync()
         {
             // Session key per user

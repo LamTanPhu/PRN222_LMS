@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36401.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{C4614483-445F-4517-A40B-B618F025EB8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{C4614483-445F-4517-A40B-B618F025EB8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{3CAF6F23-B455-4359-A8D1-8A877CD67EFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Service\Service.csproj", "{3CAF6F23-B455-4359-A8D1-8A877CD67EFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorPages_PRN222", "RazorPages_PRN222\RazorPages_PRN222.csproj", "{5EC621B8-14AC-4ED0-8154-62A04C48C555}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RazorPages_PRN222", "RazorPages_PRN222\RazorPages_PRN222.csproj", "{5EC621B8-14AC-4ED0-8154-62A04C48C555}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

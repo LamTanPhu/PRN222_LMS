@@ -1,14 +1,69 @@
 ﻿@page
-@model RazorPages_PRN222.Pages.MyProfile.IndexModel
+@model RazorPages_PRN222.Pages.Profile.MyProfileModel
 @{
     ViewData["Title"] = "My Profile";
 }
 
 <div class="container mt-5">
-    <h1>My Profile</h1>
-    <nav>
-        <a asp-page="/Index" class="btn btn-secondary">Back to Home</a>
-        <a asp-page="/Courses/Index" class="btn btn-info">My Courses</a>
-        <a asp-page="/Checkout/Index" class="btn btn-warning">Checkout</a>
-    </nav>
+    <h2>My Profile</h2>
+    <hr />
+
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="alert alert-info">@Model.StatusMessage</div>
+    }
+
+    <form method="post" enctype="multipart/form-data">
+        <table class="table table-bordered">
+            <tr>
+                <th style="width: 200px;">Login</th>
+                <td>@Model.Input.Username</td>
+            </tr>
+            <tr>
+                <th>Full name</th>
+                <td>
+                    <input asp-for="Input.FullName" class="form-control" />
+                    <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.Input.ProfileImage))
+                    {
+                        <img src="@Model.Input.ProfileImage" alt="Profile" class="img-thumbnail" width="120" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No image uploaded</span>
+                    }
+                    <div class="mt-2">
+                        <input type="file" asp-for="ProfileImageFile" class="form-control" />
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>@Model.Input.Email</td>
+            </tr>
+            <tr>
+                <th>Bio</th>
+                <td>
+                    <textarea asp-for="Input.Bio" class="form-control"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+
+            <a asp-page="/Certificate/Index" class="btn btn-success">
+                <i class="fas fa-certificate"></i> View Certificates
+            </a>
+        </div>
+    </form>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

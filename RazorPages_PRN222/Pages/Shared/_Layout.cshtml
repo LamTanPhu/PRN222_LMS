@@ -52,8 +52,19 @@
                                 <li><a class="dropdown-item" asp-page="/Review/Index">Course Reviews</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Index" asp-role="Admin">Admin</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" asp-page="/Admin/Index">Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-page="/Admin/Courses">Manage Courses</a></li>
+                                <li><a class="dropdown-item" asp-page="/Admin/Lessons">Manage Lessons</a></li>
+                                <li><a class="dropdown-item" asp-page="/Admin/Quizzes">Manage Quizzes</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Admin/Users">Manage Users</a></li>
+                                <li><a class="dropdown-item" asp-page="/Admin/Categories">Manage Categories</a></li>
+                            </ul>
                         </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {

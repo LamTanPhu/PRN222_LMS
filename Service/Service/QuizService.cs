@@ -28,7 +28,34 @@ namespace Service.Service
             return await quizRepository.GetByIdAsync(id ?? 0);
         }
 
+        public async Task<Quiz> GetByIdAsync(int id)
+        {
+            return await quizRepository.GetByIdAsync(id);
+        }
+
+        public async Task<bool> CreateAsync(Quiz quiz)
+        {
+            var result = await quizRepository.CreateAsync(quiz);
+            return result > 0;
+        }
+
+        public async Task<bool> UpdateAsync(Quiz quiz)
+        {
+            var result = await quizRepository.UpdateAsync(quiz);
+            return result > 0;
+        }
+
         public async Task<bool> DeleteAsync(int? id)
+        {
+            var quiz = await GetByIdAsync(id);
+            if (quiz != null)
+            {
+                return await quizRepository.RemoveAsync(quiz);
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
         {
             var quiz = await GetByIdAsync(id);
             if (quiz != null)

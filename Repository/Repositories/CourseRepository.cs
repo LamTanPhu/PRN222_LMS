@@ -25,14 +25,7 @@ namespace Repository.Repositories
             return await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.Instructor)
-                .Include(c => c.Certificates)
-                .Include(c => c.CourseReviews)
-                .Include(c => c.Enrollments)
-                .Include(c => c.Forums)
-                .Include(c => c.Lessons)
-                .Include(c => c.OrderItems)
-                .Include(c => c.StudentProgresses)
-                .Include(c => c.Wishlists)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -41,14 +34,7 @@ namespace Repository.Repositories
             return await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.Instructor)
-                .Include(c => c.Certificates)
-                .Include(c => c.CourseReviews)
-                .Include(c => c.Enrollments)
-                .Include(c => c.Forums)
-                .Include(c => c.Lessons)
-                .Include(c => c.OrderItems)
-                .Include(c => c.StudentProgresses)
-                .Include(c => c.Wishlists)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CourseId == id);
         }
 
@@ -71,6 +57,28 @@ namespace Repository.Repositories
             _context.Courses.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<Course>> GetCoursesForAdminAsync()
+        {
+            return await _context.Courses
+                .Select(c => new Course
+                {
+                    CourseId = c.CourseId,
+                    Title = c.Title,
+                    Category = new Category
+                    {
+                        CategoryId = c.Category.CategoryId,
+                        Name = c.Category.Name
+                    },
+                    Instructor = new User
+                    {
+                        UserId = c.Instructor.UserId,
+                        Username = c.Instructor.Username
+                    }
+                })
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

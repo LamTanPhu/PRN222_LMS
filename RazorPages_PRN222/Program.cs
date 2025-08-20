@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Repository.DBContext;
 using Repository.Models;
 using Service.Interface;
 using Service.Service;
@@ -17,7 +18,13 @@ builder.Services.AddAuthentication("Cookies")
         options.LogoutPath = "/Logout";
         options.AccessDeniedPath = "/AccessDenied";
     });
-
+// Thêm vào Program.cs
+builder.Services.AddDbContext<CourseraStyleLMSContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.EnableSensitiveDataLogging();
+    options.EnableDetailedErrors();
+});
 // Add session for cart and other per-user state
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

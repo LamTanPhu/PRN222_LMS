@@ -28,7 +28,39 @@ namespace Service.Service
             return await lessonRepository.GetByIdAsync(id ?? 0);
         }
 
+        public async Task<Lesson> GetByIdAsync(int id)
+        {
+            return await lessonRepository.GetByIdAsync(id);
+        }
+
+        public async Task<List<Lesson>> GetLessonsForAdminAsync()
+        {
+            return await lessonRepository.GetLessonsForAdminAsync();
+        }
+
+        public async Task<bool> CreateAsync(Lesson lesson)
+        {
+            var result = await lessonRepository.CreateAsync(lesson);
+            return result > 0;
+        }
+
+        public async Task<bool> UpdateAsync(Lesson lesson)
+        {
+            var result = await lessonRepository.UpdateAsync(lesson);
+            return result > 0;
+        }
+
         public async Task<bool> DeleteAsync(int? id)
+        {
+            var lesson = await GetByIdAsync(id);
+            if (lesson != null)
+            {
+                return await lessonRepository.RemoveAsync(lesson);
+            }
+            return false;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
         {
             var lesson = await GetByIdAsync(id);
             if (lesson != null)

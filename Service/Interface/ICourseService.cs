@@ -14,6 +14,7 @@ namespace Service.Interface
         Task<bool> DeleteAsync(int? id);
         Task CreateAsync(Course course);
         Task UpdateAsync(Course course);
+        Task<List<Course>> GetCoursesForAdminAsync();
 
     }
 }

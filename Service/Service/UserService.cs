@@ -59,6 +59,7 @@ namespace Service.Service
         public async Task<List<User>> GetUsersByRoleAsync(string role)
         {
             return await userRepository.GetUsersByRoleAsync(role);
+        }
 
         public async Task<User?> RegisterAsync(string fullName, string email, string password, string UserName)
         {

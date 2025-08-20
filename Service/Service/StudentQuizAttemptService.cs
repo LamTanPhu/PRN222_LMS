@@ -42,5 +42,21 @@ namespace Service.Service
         {
             await studentQuizAttemptRepository.CreateAsync(attempt);
         }
+
+        public async Task RecordAttemptAsync(int userId, int quizId, int score)
+        {
+            var attempt = new StudentQuizAttempt
+            {
+                UserId = userId,
+                QuizId = quizId,
+                Score = score
+            };
+            await studentQuizAttemptRepository.CreateAsync(attempt);
+        }
+
+        public async Task<List<StudentQuizAttempt>> GetAttemptsByUserAsync(int userId)
+        {
+            return await studentQuizAttemptRepository.GetAttemptsByUserAsync(userId);
+        }
     }
 }

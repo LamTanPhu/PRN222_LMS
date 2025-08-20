@@ -56,5 +56,13 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<List<StudentQuizAttempt>> GetAttemptsByUserAsync(int userId)
+        {
+            return await _context.StudentQuizAttempts
+                .Where(sqa => sqa.UserId == userId)
+                .Include(sqa => sqa.Quiz)
+                .Include(sqa => sqa.User)
+                .ToListAsync();
+        }
     }
 }

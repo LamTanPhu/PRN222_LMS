@@ -55,6 +55,11 @@ namespace Service.Service
             await userRepository.UpdateAsync(user);
         }
 
+
+        public async Task<List<User>> GetUsersByRoleAsync(string role)
+        {
+            return await userRepository.GetUsersByRoleAsync(role);
+
         public async Task<User?> RegisterAsync(string fullName, string email, string password, string UserName)
         {
             var exists = await userRepository.GetByEmailAsync(email);
@@ -85,6 +90,7 @@ namespace Service.Service
             //var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             //return Convert.ToBase64String(bytes);
             return password;
+
         }
     }
 }

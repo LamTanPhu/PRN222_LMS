@@ -13,5 +13,7 @@ namespace Service.Interface
         Task<Enrollment> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
         Task CreateAsync(Enrollment enrollment);
+        Task<List<Enrollment>> GetEnrollmentsByUserAsync(int userId);
+        Task EnrollAsync(int courseId, int userId);
     }
 }

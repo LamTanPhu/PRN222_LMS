@@ -54,7 +54,13 @@
             </tr>
         </table>
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+
+            <a asp-page="/Certificate/Index" class="btn btn-success">
+                <i class="fas fa-certificate"></i> View Certificates
+            </a>
+        </div>
     </form>
 </div>
 

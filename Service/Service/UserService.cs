@@ -14,14 +14,14 @@ namespace Service.Service
     {
         private readonly UserRepository userRepository;
 
-        public async Task<User> LoginAsync(string email, string password)
-        {
-            return await userRepository.LoginAsync(email, password);
-        }
-
         public UserService()
         {
             userRepository = new UserRepository();
+        }
+
+        public async Task<User> LoginAsync(string email, string password)
+        {
+            return await userRepository.LoginAsync(email, password);
         }
 
         public async Task<List<User>> GetAllAsync()
@@ -59,6 +59,7 @@ namespace Service.Service
         public async Task<List<User>> GetUsersByRoleAsync(string role)
         {
             return await userRepository.GetUsersByRoleAsync(role);
+        }
 
         public async Task<User?> RegisterAsync(string fullName, string email, string password, string UserName)
         {

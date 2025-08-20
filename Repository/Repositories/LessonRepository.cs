@@ -24,8 +24,7 @@ namespace Repository.Repositories
         {
             return await _context.Lessons
                 .Include(l => l.Course)
-                .Include(l => l.Quizzes)
-                .Include(l => l.StudentProgresses)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -33,8 +32,7 @@ namespace Repository.Repositories
         {
             return await _context.Lessons
                 .Include(l => l.Course)
-                .Include(l => l.Quizzes)
-                .Include(l => l.StudentProgresses)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(l => l.LessonId == id);
         }
 
@@ -57,6 +55,30 @@ namespace Repository.Repositories
             _context.Lessons.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<Lesson>> GetLessonsForAdminAsync()
+        {
+            return await _context.Lessons
+                .Select(l => new Lesson
+                {
+                    LessonId = l.LessonId,
+                    CourseId = l.CourseId,
+                    Title = l.Title,
+                    Description = l.Description,
+                    LessonType = l.LessonType,
+                    Duration = l.Duration,
+                    SortOrder = l.SortOrder,
+                    IsPreview = l.IsPreview,
+                    CreatedAt = l.CreatedAt,
+                    Course = new Course
+                    {
+                        CourseId = l.Course.CourseId,
+                        Title = l.Course.Title
+                    }
+                })
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

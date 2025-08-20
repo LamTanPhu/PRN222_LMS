@@ -30,6 +30,11 @@
                         <p class="card-text">@(course.Description?.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)</p>
                         <p>Category: @(course.Category?.Name ?? "N/A")</p>
                         <p>Instructor: @(course.Instructor?.FullName ?? "N/A")</p>
+                        <div class="mb-3">
+                            <a asp-page="/Courses/Details" asp-route-id="@course.CourseId" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <div class="btn-group" role="group">

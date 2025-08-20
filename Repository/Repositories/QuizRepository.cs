@@ -24,8 +24,8 @@ namespace Repository.Repositories
         {
             return await _context.Quizzes
                 .Include(q => q.Lesson)
-                .Include(q => q.QuizQuestions)
-                .Include(q => q.StudentQuizAttempts)
+                    .ThenInclude(l => l.Course)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -33,8 +33,8 @@ namespace Repository.Repositories
         {
             return await _context.Quizzes
                 .Include(q => q.Lesson)
-                .Include(q => q.QuizQuestions)
-                .Include(q => q.StudentQuizAttempts)
+                    .ThenInclude(l => l.Course)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(q => q.QuizId == id);
         }
 

@@ -28,6 +28,11 @@ namespace Service.Service
             return await courseRepository.GetByIdAsync(id ?? 0);
         }
 
+        public async Task<List<Course>> GetCoursesForAdminAsync()
+        {
+            return await courseRepository.GetCoursesForAdminAsync();
+        }
+
         public async Task<bool> DeleteAsync(int? id)
         {
             var course = await GetByIdAsync(id);

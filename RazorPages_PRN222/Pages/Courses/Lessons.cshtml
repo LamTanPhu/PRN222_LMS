@@ -1,0 +1,117 @@
+@page "{id:int}"
+@model RazorPages_PRN222.Pages.Courses.LessonsModel
+@{
+    ViewData["Title"] = "Course Lessons";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-book-open me-2"></i>
+                    Lessons - @Model.CourseTitle
+                </h2>
+                <a asp-page="/Courses/Details" asp-route-id="@Model.CourseId" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Course
+                </a>
+            </div>
+
+            @if (!Model.Lessons.Any())
+            {
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-info-circle fa-3x mb-3 text-muted"></i>
+                    <h4>No lessons available yet</h4>
+                    <p class="text-muted">Lessons for this course will be added soon.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var lesson in Model.Lessons.OrderBy(l => l.SortOrder))
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 lesson-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="card-title mb-0">@lesson.Title</h5>
+                                        @if (lesson.IsPreview == true)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-eye me-1"></i>Preview
+                                            </span>
+                                        }
+                                    </div>
+                                    
+                                    <p class="card-text text-muted mb-3">
+                                        @(string.IsNullOrEmpty(lesson.Description) ? "No description available" : lesson.Description)
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            @(lesson.Duration.HasValue ? $"{lesson.Duration} min" : "Duration not set")
+                                        </span>
+                                        <span class="text-muted">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>
+                                            Lesson @lesson.SortOrder
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-file-alt me-1"></i>
+                                            @lesson.LessonType
+                                        </span>
+                                        
+                                        @if (lesson.IsCompleted == true)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Completed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
+                                                <i class="fas fa-play me-1"></i>Start Lesson
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.lesson-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+.lesson-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+
+<script>
+function startLesson(lessonId) {
+    // TODO: Implement lesson viewing functionality
+    alert('Starting lesson ' + lessonId + '. This would open the lesson content.');
+}
+</script>

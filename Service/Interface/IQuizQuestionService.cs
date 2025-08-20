@@ -11,7 +11,12 @@ namespace Service.Interface
     {
         Task<List<QuizQuestion>> GetAllAsync();
         Task<QuizQuestion> GetByIdAsync(int? id);
+        Task<QuizQuestion> GetByIdAsync(int id);
+        Task<bool> CreateAsync(QuizQuestion question);
+        Task<bool> UpdateAsync(QuizQuestion question);
         Task<bool> DeleteAsync(int? id);
+        Task<bool> DeleteAsync(int id);
+
         Task<List<QuizQuestion>> GetByQuizIdAsync(int quizId);
     }
 }

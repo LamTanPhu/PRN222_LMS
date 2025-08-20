@@ -45,6 +45,7 @@ namespace Service.Service
         {
             var result = await quizQuestionRepository.UpdateAsync(question);
             return result > 0;
+        }
         public async Task<List<QuizQuestion>> GetByQuizIdAsync(int quizId)
         {
             var context = new Repository.DBContext.CourseraStyleLMSContext();

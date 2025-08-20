@@ -58,8 +58,19 @@ namespace RazorPages_PRN222.Pages
                 var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
                 await HttpContext.SignInAsync("Cookies", claimsPrincipal);
-
-                return RedirectToPage("/Index");
+                // After successful SignInAsync
+                User.AddIdentity(claimsIdentity);
+                switch (User.Claims.First(c => c.Type == "Role").Value)
+                {
+                    case "Admin":
+                        return RedirectToPage("/Admin/Index");
+                    case "Instructor":
+                        return RedirectToPage("/Instructor/Index");
+                    case "Student":
+                        return RedirectToPage("/Index");
+                    default:
+                        return RedirectToPage("/Privacy");
+                }
             }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");

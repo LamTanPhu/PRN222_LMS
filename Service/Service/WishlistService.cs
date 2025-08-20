@@ -1,4 +1,5 @@
-﻿using Repository.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Repository.Models;
 using Repository.Repositories;
 using Service.Interface;
 using System;
@@ -16,6 +17,11 @@ namespace Service.Service
         public WishlistService()
         {
             wishlistRepository = new WishlistRepository();
+        }
+
+        public async Task<IList<Course>> GetWishlistAsync(int userId)
+        {
+            return await wishlistRepository.GetByUserAsync(userId);
         }
 
         public async Task<List<Wishlist>> GetAllAsync()
@@ -36,6 +42,21 @@ namespace Service.Service
                 return await wishlistRepository.RemoveAsync(wishlist);
             }
             return false;
+        }
+
+        public async Task AddToWishlistAsync(int userId, int courseId)
+        {
+            var exists = await wishlistRepository.ExistsAsync(userId, courseId);
+
+            if (!exists)
+            {
+                var wishlist = new Wishlist
+                {
+                    UserId = userId,
+                    CourseId = courseId,
+                };
+                await wishlistRepository.CreateAsync(wishlist);
+            }
         }
     }
 }

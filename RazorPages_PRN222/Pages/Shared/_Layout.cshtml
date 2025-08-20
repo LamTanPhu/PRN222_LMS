@@ -45,7 +45,7 @@
                             <ul class="dropdown-menu" aria-labelledby="learningDropdown">
                                 <li><a class="dropdown-item" asp-page="/Wishlist/Index">My Wishlist</a></li>
                                 <li><a class="dropdown-item" asp-page="/Progress/Index">My Progress</a></li>
-                                <li><a class="dropdown-item" asp-page="/Quiz/Index">Take Quiz</a></li>
+@*                                 <li><a class="dropdown-item" asp-page="/Quiz/Index">Take Quiz</a></li> *@
                                 <li><a class="dropdown-item" asp-page="/Certificate/Index">My Certificates</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-page="/Forum/Index">Course Forums</a></li>
@@ -53,7 +53,7 @@
                             </ul>
                         </li>
 
-                        <li class="nav-item dropdown">
+                        @* <li class="nav-item dropdown">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Admin
                             </a>
@@ -66,7 +66,7 @@
                                 <li><a class="dropdown-item" asp-page="/Admin/Users">Manage Users</a></li>
                                 <li><a class="dropdown-item" asp-page="/Admin/Categories">Manage Categories</a></li>
                             </ul>
-                        </li>
+                        </li> *@
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {

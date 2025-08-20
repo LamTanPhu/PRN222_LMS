@@ -49,6 +49,22 @@ namespace Service.Service
             return await enrollmentRepository.GetEnrollmentsByUserAsync(userId);
         }
 
+        public async Task EnrollAsync(Enrollment enrollment)
+        {
+            enrollment.EnrollmentDate = DateTime.Now;
+            enrollment.Status = "Active";
+            enrollment.PaymentStatus = "Paid";
+            enrollment.ProgressPercentage = 0;
+
+            await enrollmentRepository.AddEnrollmentAsync(enrollment);
+        }
+
+        public async Task<bool> IsEnrolledAsync(int userId, int courseId)
+        {
+            var e = await enrollmentRepository.GetByUserAndCourseAsync(userId, courseId);
+            return e != null;
+        }
+
         public async Task EnrollAsync(int courseId, int userId)
         {
             var enrollment = new Enrollment

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interface;
-namespace RazorPages_PRN222.Pages.Certificate
+namespace RazorPages_PRN222.Pages.CertificatePage
 {
     public class IndexModel : PageModel
     {

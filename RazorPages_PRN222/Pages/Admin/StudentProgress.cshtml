@@ -1,0 +1,106 @@
+﻿@page
+@model RazorPages_PRN222.Pages.Admin.StudentProgressModel
+@using Repository.Models
+
+@{
+    ViewData["Title"] = "Monitor Student Progress";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container">
+    <h1>Monitor Student Progress</h1>
+
+    @if (!string.IsNullOrEmpty(ModelState[""]?.Errors.FirstOrDefault()?.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ModelState[""].Errors.FirstOrDefault().ErrorMessage
+        </div>
+    }
+
+    <form method="get">
+        <div class="form-group">
+            <label for="SelectedUserId">Select Student</label>
+            <select asp-for="SelectedUserId" class="form-control" onchange="this.form.submit()">
+                <option value="0">Select a student</option>
+                @foreach (var user in Model.Users ?? new List<User>())
+                {
+                    <option value="@user.UserId">@user.Username</option>
+                }
+            </select>
+        </div>
+    </form>
+
+    @if (Model.SelectedUserId > 0)
+    {
+        <h3>Enrollments</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Enrollment Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var enrollment in Model.Enrollments ?? new List<Enrollment>())
+                {
+                    <tr>
+                        <td>@(enrollment.Course?.Title ?? "N/A")</td>
+                        <td>@enrollment.EnrollmentDate.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Lesson Progress</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Lesson</th>
+                    <th>Completed</th>
+                    <th>Completion Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var progress in Model.Progress ?? new List<StudentProgress>())
+                {
+                    <tr>
+                        <td>@(progress.Course?.Title ?? "N/A")</td>
+                        <td>@(progress.Lesson?.Title ?? "N/A")</td>
+                        <td>@(progress.IsCompleted)</td>
+                        <td>@(progress.CompletedAt?.ToString())</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Quiz Attempts</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Lesson</th>
+                    <th>Quiz</th>
+                    <th>Score</th>
+                    <th>Attempt Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var attempt in Model.QuizAttempts ?? new List<StudentQuizAttempt>())
+                {
+                    <tr>
+                        <td>@(attempt.Quiz?.Lesson?.Course?.Title ?? "N/A")</td>
+                        <td>@(attempt.Quiz?.Lesson?.Title ?? "N/A")</td>
+                        <td>@(attempt.Quiz?.Title ?? "N/A")</td>
+                        <td>@attempt.Score</td>
+                        <td>@attempt.StartedAt.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

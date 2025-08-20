@@ -56,5 +56,12 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<List<Enrollment>> GetEnrollmentsByUserAsync(int userId)
+        {
+            return await _context.Enrollments
+                .Include(e => e.Course)
+                .Where(e => e.UserId == userId)
+                .ToListAsync();
+        }
     }
 }

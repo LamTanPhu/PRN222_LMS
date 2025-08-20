@@ -17,5 +17,7 @@ namespace Service.Interface
         Task<bool> UpdateAsync(Lesson lesson);
         Task<bool> DeleteAsync(int? id);
         Task<bool> DeleteAsync(int id);
+        Task<Lesson> CreateAsync(Lesson lesson, int courseId);
+
     }
 }

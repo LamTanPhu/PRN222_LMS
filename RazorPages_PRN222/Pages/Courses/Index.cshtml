@@ -43,9 +43,20 @@
                                         <i class="fas fa-graduation-cap"></i> Enroll
                                     </button>
                                 </form>
-                                <a asp-page="/Wishlist/Index" asp-route-courseId="@course.CourseId" class="btn btn-outline-danger">
-                                    <i class="fas fa-heart"></i> Wishlist
-                                </a>
+                                <form method="post" asp-page-handler="Wishlist" asp-route-courseId="@course.CourseId" style="display:inline;">
+                                    @if (Model.WishlistCourseIds.Contains(course.CourseId))
+                                    {
+                                        <button type="submit" class="btn btn-danger" value="goto" name="action">
+                                            <i class="fas fa-heart"></i> View wishlist
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-outline-danger" value="add" name="action">
+                                            <i class="fas fa-heart"></i> Add wishlist
+                                        </button>
+                                    }
+                                </form>
                                 <a asp-page="/Review/Index" asp-route-courseId="@course.CourseId" class="btn btn-outline-warning">
                                     <i class="fas fa-star"></i> Review
                                 </a>

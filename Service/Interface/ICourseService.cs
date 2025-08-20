@@ -12,7 +12,7 @@ namespace Service.Interface
         Task<List<Course>> GetAllAsync();
         Task<Course> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
-        Task CreateAsync(Course course);
+        Task<Course> CreateAsync(Course course, int id);
         Task UpdateAsync(Course course);
         Task<List<Course>> GetCoursesForAdminAsync();
 

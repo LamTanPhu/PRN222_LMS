@@ -52,6 +52,7 @@
                                 <li><a class="dropdown-item" asp-page="/Review/Index">Course Reviews</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item dropdown">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Admin
@@ -66,6 +67,7 @@
                                 <li><a class="dropdown-item" asp-page="/Admin/Categories">Manage Categories</a></li>
                             </ul>
                         </li>
+
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown">
@@ -83,6 +85,9 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Register">Register</a>
                             </li>
                         }
                     </ul>

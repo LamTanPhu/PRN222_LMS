@@ -22,11 +22,8 @@
                     <td>@course.CourseId</td>
                     <td>@course.Title</td>
                     <td>
-                        <a asp-page="./Edit" asp-route-id="@course.CourseId" class="btn btn-primary btn-sm">Edit</a>
-                        <form asp-page-handler="Delete" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@course.CourseId" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCourseModal-@course.CourseId">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCourseModal-@course.CourseId">Delete</button>
                     </td>
                 </tr>
             }
@@ -34,3 +31,79 @@
     </table>
     <a asp-page="/Courses/Create" class="btn btn-success">Add New Course</a>
 </div>
+
+<!-- Edit Course Modal -->
+@foreach (var course in Model.Courses)
+{
+    <div class="modal fade" id="editCourseModal-@course.CourseId" tabindex="-1" aria-labelledby="editCourseModalLabel-@course.CourseId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCourseModalLabel-@course.CourseId">Edit Course (ID: @course.CourseId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@course.CourseId">
+                        <input type="hidden" asp-for="@Model.EditCourse.CourseId" value="@course.CourseId" />
+                        <div class="form-group">
+                            <label asp-for="@Model.EditCourse.Title">Title</label>
+                            <input asp-for="@Model.EditCourse.Title" class="form-control" value="@course.Title" />
+                            <span asp-validation-for="@Model.EditCourse.Title" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditCourse.Description">Description</label>
+                            <textarea asp-for="@Model.EditCourse.Description" class="form-control">@course.Description</textarea>
+                            <span asp-validation-for="@Model.EditCourse.Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditCourse.InstructorId">Instructor</label>
+                            <select asp-for="@Model.EditCourse.InstructorId" class="form-control" asp-items="Model.InstructorOptions">
+                                <option value="@course.InstructorId" selected>@course.Instructor?.Username</option>
+                            </select>
+                            <span asp-validation-for="@Model.EditCourse.InstructorId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditCourse.CategoryId">Category</label>
+                            <select asp-for="@Model.EditCourse.CategoryId" class="form-control" asp-items="Model.CategoryOptions">
+                                <option value="@course.CategoryId" selected>@course.Category?.Name</option>
+                            </select>
+                            <span asp-validation-for="@Model.EditCourse.CategoryId" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Course Modal -->
+@foreach (var course in Model.Courses)
+{
+    <div class="modal fade" id="deleteCourseModal-@course.CourseId" tabindex="-1" aria-labelledby="deleteCourseModalLabel-@course.CourseId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCourseModalLabel-@course.CourseId">Delete Course (ID: @course.CourseId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete course with ID @course.CourseId?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@course.CourseId" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

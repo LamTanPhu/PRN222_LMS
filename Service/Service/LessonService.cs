@@ -60,6 +60,7 @@ namespace Service.Service
             return false;
         }
 
+
         public async Task<bool> DeleteAsync(int id)
         {
             var lesson = await GetByIdAsync(id);
@@ -68,6 +69,11 @@ namespace Service.Service
                 return await lessonRepository.RemoveAsync(lesson);
             }
             return false;
+        public async Task<Lesson> CreateAsync(Lesson lesson, int courseId)
+        {
+            lesson.CourseId = courseId;
+            await lessonRepository.CreateAsync(lesson);
+            return lesson;
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿@page
-@model RazorPages_PRN222.Pages.Admin.AnnouncementsModel
+@model RazorPages_PRN222.Pages.Admin.AnnouncementModel
 @{
     ViewData["Title"] = "Manage Announcements";
     Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
+
 <div class="container">
     <h1>Manage Announcements</h1>
     <table class="table">
@@ -21,15 +22,155 @@
                     <td>@announcement.AnnouncementId</td>
                     <td>@announcement.Title</td>
                     <td>
-                        <a asp-page="./Edit" asp-route-id="@announcement.AnnouncementId" class="btn btn-primary btn-sm">Edit</a>
-                        <form asp-page-handler="Delete" method="post" style="display:inline;">
-                            <input type="hidden" name="id" value="@announcement.AnnouncementId" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal-@announcement.AnnouncementId">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAnnouncementModal-@announcement.AnnouncementId">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a asp-page="./Create" class="btn btn-success">Add New Announcement</a>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">Add New Announcement</button>
 </div>
+
+<!-- Add Announcement Modal -->
+<div class="modal fade" id="addAnnouncementModal" tabindex="-1" aria-labelledby="addAnnouncementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAnnouncementModalLabel">Add New Announcement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Create">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.Title">Title</label>
+                        <input asp-for="NewAnnouncement.Title" class="form-control" />
+                        <span asp-validation-for="NewAnnouncement.Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.Content">Content</label>
+                        <textarea asp-for="NewAnnouncement.Content" class="form-control"></textarea>
+                        <span asp-validation-for="NewAnnouncement.Content" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.AnnouncementType">Type</label>
+                        <select asp-for="NewAnnouncement.AnnouncementType" class="form-control">
+                            <option value="">Select a type</option>
+                            <option value="News">News</option>
+                            <option value="Event">Event</option>
+                            <option value="Update">Update</option>
+                            <option value="Promotion">Promotion</option>
+                        </select>
+                        <span asp-validation-for="NewAnnouncement.AnnouncementType" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.AuthorId">Author</label>
+                        <select asp-for="NewAnnouncement.AuthorId" asp-items="Model.UserOptions" class="form-control">
+                            <option value="">Select an author</option>
+                        </select>
+                        <span asp-validation-for="NewAnnouncement.AuthorId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="NewAnnouncement.PublishDate">Publish Date</label>
+                        <input asp-for="NewAnnouncement.PublishDate" class="form-control" type="date" />
+                        <span asp-validation-for="NewAnnouncement.PublishDate" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Announcement Modal -->
+@foreach (var announcement in Model.Announcements)
+{
+    <div class="modal fade" id="editAnnouncementModal-@announcement.AnnouncementId" tabindex="-1" aria-labelledby="editAnnouncementModalLabel-@announcement.AnnouncementId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAnnouncementModalLabel-@announcement.AnnouncementId">Edit Announcement (ID: @announcement.AnnouncementId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="Edit" asp-route-id="@announcement.AnnouncementId">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input type="hidden" asp-for="@Model.EditAnnouncement.AnnouncementId" value="@announcement.AnnouncementId" />
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.Title">Title</label>
+                            <input asp-for="@Model.EditAnnouncement.Title" class="form-control" value="@announcement.Title" />
+                            <span asp-validation-for="@Model.EditAnnouncement.Title" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.Content">Content</label>
+                            <textarea asp-for="@Model.EditAnnouncement.Content" class="form-control">@announcement.Content</textarea>
+                            <span asp-validation-for="@Model.EditAnnouncement.Content" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.AnnouncementType">Type</label>
+                            <select asp-for="@Model.EditAnnouncement.AnnouncementType" class="form-control">
+                                <option value="">Select a type</option>
+                                <option value="News" selected="@(announcement.AnnouncementType == "News")">News</option>
+                                <option value="Event" selected="@(announcement.AnnouncementType == "Event")">Event</option>
+                                <option value="Update" selected="@(announcement.AnnouncementType == "Update")">Update</option>
+                                <option value="Promotion" selected="@(announcement.AnnouncementType == "Promotion")">Promotion</option>
+                            </select>
+                            <span asp-validation-for="@Model.EditAnnouncement.AnnouncementType" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.AuthorId">Author</label>
+                            <select asp-for="@Model.EditAnnouncement.AuthorId" class="form-control">
+                                <option value="">Select an author</option>
+                                @if (Model.UserOptions != null)
+                                {
+                                    @foreach (var user in Model.UserOptions)
+                                    {
+                                        <option value="@user.Value" selected="@(announcement.AuthorId.ToString() == user.Value)">@user.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="@Model.EditAnnouncement.AuthorId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.EditAnnouncement.PublishDate">Publish Date</label>
+                            <input asp-for="@Model.EditAnnouncement.PublishDate" class="form-control" type="date" value="@announcement.PublishDate?.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="@Model.EditAnnouncement.PublishDate" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Delete Announcement Modal -->
+@foreach (var announcement in Model.Announcements)
+{
+    <div class="modal fade" id="deleteAnnouncementModal-@announcement.AnnouncementId" tabindex="-1" aria-labelledby="deleteAnnouncementModalLabel-@announcement.AnnouncementId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAnnouncementModalLabel-@announcement.AnnouncementId">Delete Announcement (ID: @announcement.AnnouncementId)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete announcement with ID @announcement.AnnouncementId?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@announcement.AnnouncementId" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

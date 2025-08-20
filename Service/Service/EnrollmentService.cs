@@ -1,4 +1,5 @@
-﻿using Repository.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Repository.Models;
 using Repository.Repositories;
 using Service.Interface;
 using System;
@@ -40,6 +41,21 @@ namespace Service.Service
 
         public async Task CreateAsync(Enrollment enrollment)
         {
+            await enrollmentRepository.CreateAsync(enrollment);
+        }
+
+        public async Task<List<Enrollment>> GetEnrollmentsByUserAsync(int userId)
+        {
+            return await enrollmentRepository.GetEnrollmentsByUserAsync(userId);
+        }
+
+        public async Task EnrollAsync(int courseId, int userId)
+        {
+            var enrollment = new Enrollment
+            {
+                UserId = userId,
+                CourseId = courseId
+            };
             await enrollmentRepository.CreateAsync(enrollment);
         }
     }

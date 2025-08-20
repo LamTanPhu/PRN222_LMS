@@ -20,6 +20,10 @@ namespace Repository.Repositories
         {
         }
 
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
+        }
         public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users
@@ -81,12 +85,17 @@ namespace Repository.Repositories
             return true;
         }
 
-
         public async Task<User> LoginAsync(string email, string password)
         {
             return await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == email && u.PasswordHash == password);
+        }
+        public async Task<List<User>> GetUsersByRoleAsync(string role)
+        {
+            return await _context.Users
+                .Where(u => u.Role.RoleName == role)
+                .ToListAsync() ?? new List<User>();
         }
     }
 }

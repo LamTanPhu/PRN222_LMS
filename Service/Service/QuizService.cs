@@ -63,6 +63,10 @@ namespace Service.Service
                 return await quizRepository.RemoveAsync(quiz);
             }
             return false;
+        public async Task CreateAsync(Quiz quiz, int lessonId)
+        {
+            quiz.LessonId = lessonId;
+            await quizRepository.CreateAsync(quiz);
         }
     }
 }

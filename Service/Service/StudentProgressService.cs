@@ -37,5 +37,15 @@ namespace Service.Service
             }
             return false;
         }
+
+        public async Task UpdateProgressAsync(int userId, int courseId, int lessonId, bool isCompleted)
+        {
+            await studentProgressRepository.UpdateAsync(userId, courseId, lessonId, isCompleted);
+        }
+
+        public async Task<List<StudentProgress>> GetStudentProgressesByUserAsync(int userId)
+        {
+            return await studentProgressRepository.GetStudentProgressesByUserAsync(userId);
+        }
     }
 }

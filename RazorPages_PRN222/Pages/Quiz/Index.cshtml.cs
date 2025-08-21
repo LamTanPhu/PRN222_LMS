@@ -11,17 +11,20 @@ namespace RazorPages_PRN222.Pages.Quiz
         private readonly IStudentQuizAttemptService _attemptService;
         private readonly ICourseService _courseService;
         private readonly IQuizQuestionService _quizQuestionService;
+        private readonly ILessonService _lessonService;
 
         public IndexModel(
             IQuizService quizService, 
             IStudentQuizAttemptService attemptService, 
             ICourseService courseService, 
-            IQuizQuestionService quizQuestionService)
+            IQuizQuestionService quizQuestionService,
+            ILessonService lessonService)
         {
             _quizService = quizService;
             _attemptService = attemptService;
             _courseService = courseService;
             _quizQuestionService = quizQuestionService;
+            _lessonService = lessonService;
         }
 
         // Form binding properties
@@ -64,25 +67,73 @@ namespace RazorPages_PRN222.Pages.Quiz
                 }
                 CourseTitle = course.Title;
 
-                // Get quiz for this course
-                var lessons = course.Lessons?.ToList() ?? new List<Repository.Models.Lesson>();
-                if (lessons.Any())
+                // Debug: Log course information
+                System.Diagnostics.Debug.WriteLine($"=== QUIZ PAGE DEBUG ===");
+                System.Diagnostics.Debug.WriteLine($"Course ID: {courseId}, Title: {course.Title}");
+
+                // Get all lessons for this course
+                var allLessons = await _lessonService.GetAllAsync();
+                var courseLessons = allLessons.Where(l => l.CourseId == courseId).OrderBy(l => l.SortOrder).ToList();
+                
+                System.Diagnostics.Debug.WriteLine($"Lessons found: {courseLessons.Count}");
+                foreach (var lesson in courseLessons)
                 {
-                    var firstLesson = lessons.First();
-                    var allQuizzes = await _quizService.GetAllAsync();
-                    Quiz = allQuizzes.FirstOrDefault(q => q.LessonId == firstLesson.LessonId);
+                    System.Diagnostics.Debug.WriteLine($"  Lesson {lesson.LessonId}: {lesson.Title}");
+                }
+
+                // Get all quizzes and find ones that belong to lessons in this course
+                var allQuizzes = await _quizService.GetAllAsync();
+                var lessonIds = courseLessons.Select(l => l.LessonId).ToList();
+                var courseQuizzes = allQuizzes.Where(q => lessonIds.Contains(q.LessonId)).ToList();
+                
+                System.Diagnostics.Debug.WriteLine($"Quizzes found: {courseQuizzes.Count}");
+                foreach (var quiz in courseQuizzes)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title} (LessonId: {quiz.LessonId})");
+                }
+
+                // Select the first available quiz (or you could show a list to choose from)
+                if (courseQuizzes.Any())
+                {
+                    Quiz = courseQuizzes.First();
+                    QuizId = Quiz.QuizId;
                     
-                    if (Quiz != null)
+                    System.Diagnostics.Debug.WriteLine($"Selected Quiz: {Quiz.QuizId} - {Quiz.Title}");
+                    
+                    // Load questions for this quiz
+                    Questions = await _quizQuestionService.GetByQuizIdAsync(Quiz.QuizId);
+                    
+                    if (Questions != null && Questions.Any())
                     {
-                        QuizId = Quiz.QuizId;
-                        Questions = await _quizQuestionService.GetByQuizIdAsync(Quiz.QuizId);
+                        System.Diagnostics.Debug.WriteLine($"✓ Successfully loaded {Questions.Count} questions for quiz {Quiz.QuizId}");
+                        
+                        // Load answers for each question if needed
+                        foreach (var question in Questions)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"  Question {question.QuestionId}: {question.QuestionText.Substring(0, Math.Min(50, question.QuestionText.Length))}...");
+                            System.Diagnostics.Debug.WriteLine($"    Type: {question.QuestionType}, Points: {question.Points}");
+                            System.Diagnostics.Debug.WriteLine($"    Answers: {question.QuizAnswers?.Count ?? 0}");
+                        }
                     }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"✗ No questions found for quiz {Quiz.QuizId}");
+                        Questions = new List<Repository.Models.QuizQuestion>();
+                    }
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("✗ No quizzes found for this course");
+                    Quiz = null;
+                    Questions = new List<Repository.Models.QuizQuestion>();
                 }
 
                 return Page();
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error in Quiz OnGetAsync: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 // Log error and return error page
                 return RedirectToPage("/Error");
             }

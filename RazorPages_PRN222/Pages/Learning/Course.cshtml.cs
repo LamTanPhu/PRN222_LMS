@@ -75,45 +75,64 @@ namespace RazorPages_PRN222.Pages.Learning
 
         private async Task LoadCourseData(int userId, int courseId)
         {
-            // Get lessons
-            var allLessons = await _lessonService.GetAllAsync();
-            Lessons = allLessons.Where(l => l.CourseId == courseId).OrderBy(l => l.SortOrder).ToList();
-            TotalLessons = Lessons.Count;
-
-            // Get quizzes with questions
-            var allQuizzes = await _quizService.GetAllAsync();
-            Quizzes = allQuizzes.Where(q => q.Lesson.CourseId == courseId).ToList();
-            TotalQuizzes = Quizzes.Count;
-            
-            // Debug: Log quiz information
-            System.Diagnostics.Debug.WriteLine($"Course {courseId}: Found {Quizzes.Count} quizzes");
-            foreach (var quiz in Quizzes)
+            try
             {
-                System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title}, Questions: {quiz.QuizQuestions?.Count ?? 0}");
+                // Get lessons for this course
+                var allLessons = await _lessonService.GetAllAsync();
+                Lessons = allLessons.Where(l => l.CourseId == courseId).OrderBy(l => l.SortOrder).ToList();
+                TotalLessons = Lessons.Count;
+
+                // Get quizzes for this course by finding lessons first, then quizzes for those lessons
+                var allQuizzes = await _quizService.GetAllAsync();
+                var lessonIds = Lessons.Select(l => l.LessonId).ToList();
+                
+                // Load quizzes that belong to lessons in this course
+                Quizzes = allQuizzes.Where(q => lessonIds.Contains(q.LessonId)).ToList();
+                TotalQuizzes = Quizzes.Count;
+                
+                // Debug: Log detailed information
+                System.Diagnostics.Debug.WriteLine($"=== COURSE DATA DEBUG ===");
+                System.Diagnostics.Debug.WriteLine($"Course ID: {courseId}, Title: {Course?.Title}");
+                System.Diagnostics.Debug.WriteLine($"Lessons found: {TotalLessons}");
+                foreach (var lesson in Lessons)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Lesson {lesson.LessonId}: {lesson.Title} (CourseId: {lesson.CourseId})");
+                }
+                
+                System.Diagnostics.Debug.WriteLine($"Quizzes found: {TotalQuizzes}");
+                foreach (var quiz in Quizzes)
+                {
+                    System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title} (LessonId: {quiz.LessonId})");
+                }
+
+                // Get lesson progress
+                var allProgress = await _studentProgressService.GetAllAsync();
+                LessonProgress = allProgress.Where(p => p.UserId == userId && p.CourseId == courseId).ToList();
+                CompletedLessons = LessonProgress.Count(p => p.IsCompleted == true);
+
+                // Get quiz attempts
+                var allQuizAttempts = await _studentQuizAttemptService.GetAllAsync();
+                QuizAttempts = allQuizAttempts.Where(a => a.UserId == userId && Quizzes.Any(q => q.QuizId == a.QuizId)).ToList();
+                PassedQuizzes = QuizAttempts.Count(a => a.IsPassed == true);
+
+                // Get recent activity
+                RecentActivity = LessonProgress
+                    .OrderByDescending(p => p.LastAccessedAt)
+                    .Take(5)
+                    .ToList();
+
+                // Update enrollment progress
+                if (TotalLessons > 0)
+                {
+                    Enrollment.ProgressPercentage = (decimal)CompletedLessons / TotalLessons * 100;
+                    Enrollment.LastAccessedAt = DateTime.Now;
+                    await _enrollmentService.UpdateAsync(Enrollment);
+                }
             }
-
-            // Get lesson progress
-            var allProgress = await _studentProgressService.GetAllAsync();
-            LessonProgress = allProgress.Where(p => p.UserId == userId && p.CourseId == courseId).ToList();
-            CompletedLessons = LessonProgress.Count(p => p.IsCompleted == true);
-
-            // Get quiz attempts
-            var allQuizAttempts = await _studentQuizAttemptService.GetAllAsync();
-            QuizAttempts = allQuizAttempts.Where(a => a.UserId == userId && Quizzes.Any(q => q.QuizId == a.QuizId)).ToList();
-            PassedQuizzes = QuizAttempts.Count(a => a.IsPassed == true);
-
-            // Get recent activity
-            RecentActivity = LessonProgress
-                .OrderByDescending(p => p.LastAccessedAt)
-                .Take(5)
-                .ToList();
-
-            // Update enrollment progress
-            if (TotalLessons > 0)
+            catch (Exception ex)
             {
-                Enrollment.ProgressPercentage = (decimal)CompletedLessons / TotalLessons * 100;
-                Enrollment.LastAccessedAt = DateTime.Now;
-                await _enrollmentService.UpdateAsync(Enrollment);
+                System.Diagnostics.Debug.WriteLine($"Error in LoadCourseData: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             }
         }
     }

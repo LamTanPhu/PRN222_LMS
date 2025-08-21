@@ -1,31 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Service.Interface;
-using Repository.Models;
 
 namespace RazorPages_PRN222.Pages.Progress
 {
     public class CourseProgressViewModel
     {
-        public Enrollment Enrollment { get; set; }
+        public int CourseId { get; set; }
+        public string CourseTitle { get; set; }
+        public string Status { get; set; }
+        public string PaymentStatus { get; set; }
+        public DateTime? EnrollmentDate { get; set; }
+        public decimal ProgressPercentage { get; set; }
         public int CompletedLessons { get; set; }
         public int TotalLessons { get; set; }
-        public decimal ProgressPercentage { get; set; }
     }
 
     public class IndexModel : PageModel
     {
-        private readonly IEnrollmentService _enrollmentService;
         private readonly IStudentProgressService _progressService;
-        private readonly ILessonService _lessonService; 
+        private readonly IEnrollmentService _enrollmentService;
 
-        public IndexModel(IEnrollmentService enrollmentService,
-                          IStudentProgressService progressService,
-                          ILessonService lessonService)
+        public IndexModel(IStudentProgressService progressService, IEnrollmentService enrollmentService)
         {
-            _enrollmentService = enrollmentService;
             _progressService = progressService;
-            _lessonService = lessonService;
+            _enrollmentService = enrollmentService;
         }
 
         public List<CourseProgressViewModel> CourseProgressList { get; set; } = new();
@@ -33,45 +32,31 @@ namespace RazorPages_PRN222.Pages.Progress
         public async Task<IActionResult> OnGetAsync()
         {
             if (!(User.Identity?.IsAuthenticated ?? false))
-            {
                 return RedirectToPage("/Login");
-            }
 
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
                 return RedirectToPage("/Login");
 
-            // Get user enrollments
+            // Get enrollments
             var allEnrollments = await _enrollmentService.GetAllAsync();
             var enrollments = allEnrollments.Where(e => e.UserId == userId).ToList();
 
-            // Get progress records for this user
-            var allProgress = await _progressService.GetAllAsync();
-            var progressList = allProgress.Where(p => p.UserId == userId).ToList();
-
-            // Get all lessons
-            var allLessons = await _lessonService.GetAllAsync();
-
             foreach (var enrollment in enrollments)
             {
-                // Lessons for this course
-                var lessons = allLessons.Where(l => l.CourseId == enrollment.CourseId).ToList();
-                int totalLessons = lessons.Count;
-
-                // Completed lessons for this course
-                var courseProgress = progressList.Where(p => p.CourseId == enrollment.CourseId && p.IsCompleted == true).ToList();
-                int completedLessons = courseProgress.Count;
-
-                decimal progressPercentage = totalLessons > 0
-                    ? Math.Round((decimal)completedLessons / totalLessons * 100, 2)
-                    : 0;
+                var progressDto = await _progressService.GetCourseProgressAsync(userId, enrollment.CourseId);
+                if (progressDto == null) continue;
 
                 CourseProgressList.Add(new CourseProgressViewModel
                 {
-                    Enrollment = enrollment,
-                    CompletedLessons = completedLessons,
-                    TotalLessons = totalLessons,
-                    ProgressPercentage = progressPercentage
+                    CourseId = enrollment.CourseId,
+                    CourseTitle = enrollment.Course.Title,
+                    Status = progressDto.Status,
+                    PaymentStatus = enrollment.PaymentStatus,
+                    EnrollmentDate = enrollment.EnrollmentDate,
+                    ProgressPercentage = progressDto.Progress,
+                    CompletedLessons = progressDto.CompletedLessons,
+                    TotalLessons = progressDto.TotalLessons
                 });
             }
 

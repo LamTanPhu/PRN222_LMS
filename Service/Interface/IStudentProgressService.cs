@@ -1,4 +1,5 @@
 ﻿using Repository.Models;
+using Repository.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace Service.Interface
         Task UpdateProgressAsync(int userId, int courseId, int lessonId, bool isCompleted);
         Task<List<StudentProgress>> GetStudentProgressesByUserAsync(int userId);
 
-        Task<object> GetCourseProgressAsync(int userId, int courseId);  
+        Task<CourseProgressDto> GetCourseProgressAsync(int userId, int courseId);  
+        Task MarkLessonCompletedAsync(int userId, int courseId, int lessonId);
 
     }
 }

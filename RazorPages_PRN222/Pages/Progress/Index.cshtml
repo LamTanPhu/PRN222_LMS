@@ -6,56 +6,55 @@
 
 <div class="container mt-5">
     <h1>My Learning Progress</h1>
-    
-    @if (Model.Enrollments.Any())
+
+    @if (Model.CourseProgressList.Any())
     {
-        @foreach (var enrollment in Model.Enrollments)
+        @foreach (var item in Model.CourseProgressList)
         {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">@enrollment.Course.Title</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Enrollment Date:</strong> @enrollment.EnrollmentDate?.ToString("MM/dd/yyyy")</p>
-                            <p><strong>Status:</strong> <span class="badge bg-@(enrollment.Status == "Active" ? "success" : "secondary")">@enrollment.Status</span></p>
-                            <p><strong>Payment Status:</strong> <span class="badge bg-@(enrollment.PaymentStatus == "Paid" ? "success" : "warning")">@enrollment.PaymentStatus</span></p>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">@item.Enrollment.Course.Title</h5>
                         </div>
-                        <div class="col-md-6">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Enrollment Date:</strong> @item.Enrollment.EnrollmentDate?.ToString("MM/dd/yyyy")</p>
+                                    <p><strong>Status:</strong> <span class="badge bg-@(item.Enrollment.Status == "Active" ? "success" : "secondary")">@item.Enrollment.Status</span></p>
+                                    <p><strong>Payment Status:</strong> <span class="badge bg-@(item.Enrollment.PaymentStatus == "Paid" ? "success" : "warning")">@item.Enrollment.PaymentStatus</span></p>
+                                </div>
+                                <div class="col-md-6">
                             @{
-                                var progress = Model.ProgressList.FirstOrDefault(p => p.CourseId == enrollment.CourseId);
+                                var progress = item.Progress;
                                 var completedLessons = progress?.IsCompleted == true ? 1 : 0;
-                                var totalLessons = enrollment.Course.Lessons?.Count ?? 0;
+                                var totalLessons = item.Enrollment.Course.Lessons?.Count ?? 0;
                                 var progressPercentage = totalLessons > 0 ? (completedLessons * 100.0 / totalLessons) : 0;
                             }
-                            <p><strong>Progress:</strong> @progressPercentage.ToString("F1")%</p>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: @progressPercentage%" 
-                                     aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                    <p><strong>Progress:</strong> @progressPercentage.ToString("F1")%</p>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: @progressPercentage%" 
+                                             aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
                                     @progressPercentage.ToString("F1")%
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <a asp-page="/Courses/Learn" asp-route-courseId="@item.Enrollment.CourseId" class="btn btn-primary">Continue Learning</a>
+                                <a asp-page="/Quiz/Index" asp-route-courseId="@item.Enrollment.CourseId" class="btn btn-info">Take Quiz</a>
+                        @if (progressPercentage >= 100)
+                        {
+                                        <a asp-page="/Certificate/Index" asp-route-courseId="@item.Enrollment.CourseId" class="btn btn-success">Get Certificate</a>
+                        }
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="mt-3">
-                        <a asp-page="/Courses/Learn" asp-route-courseId="@enrollment.CourseId" class="btn btn-primary">Continue Learning</a>
-                        <a asp-page="/Quiz/Index" asp-route-courseId="@enrollment.CourseId" class="btn btn-info">Take Quiz</a>
-                        @if (progressPercentage >= 100)
-                        {
-                            <a asp-page="/Certificate/Index" asp-route-courseId="@enrollment.CourseId" class="btn btn-success">Get Certificate</a>
-                        }
-                    </div>
-                </div>
-            </div>
         }
     }
     else
     {
-        <div class="alert alert-info">
-            <p>You haven't enrolled in any courses yet. <a asp-page="/Courses/Index">Browse courses</a> to get started!</p>
-        </div>
+            <div class="alert alert-info">
+                <p>You haven't enrolled in any courses yet. <a asp-page="/Courses/Index">Browse courses</a> to get started!</p>
+            </div>
     }
 </div>
-

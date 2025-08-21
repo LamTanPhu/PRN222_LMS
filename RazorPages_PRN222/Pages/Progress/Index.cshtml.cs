@@ -5,6 +5,12 @@ using Repository.Models;
 
 namespace RazorPages_PRN222.Pages.Progress
 {
+    public class CourseProgressViewModel
+    {
+        public Enrollment Enrollment { get; set; }
+        public StudentProgress Progress { get; set; }
+    }
+
     public class IndexModel : PageModel
     {
         private readonly IEnrollmentService _enrollmentService;
@@ -16,12 +22,11 @@ namespace RazorPages_PRN222.Pages.Progress
             _progressService = progressService;
         }
 
-        public List<Repository.Models.Enrollment> Enrollments { get; set; } = new List<Repository.Models.Enrollment>();
-        public List<Repository.Models.StudentProgress> ProgressList { get; set; } = new List<Repository.Models.StudentProgress>();
+        public List<CourseProgressViewModel> CourseProgressList { get; set; } = new List<CourseProgressViewModel>();
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!User.Identity?.IsAuthenticated ?? true)
+            if (!(User.Identity?.IsAuthenticated ?? false))
             {
                 return RedirectToPage("/Login");
             }
@@ -32,14 +37,23 @@ namespace RazorPages_PRN222.Pages.Progress
 
             // Get user enrollments with course details
             var allEnrollments = await _enrollmentService.GetAllAsync();
-            Enrollments = allEnrollments.Where(e => e.UserId == userId).ToList();
+            var enrollments = allEnrollments.Where(e => e.UserId == userId).ToList();
             
             // Get progress for each enrollment
             var allProgress = await _progressService.GetAllAsync();
-            ProgressList = allProgress.Where(p => p.UserId == userId).ToList();
+            var progressList = allProgress.Where(p => p.UserId == userId).ToList();
+
+            foreach (var enrollment in enrollments)
+            {
+                var progress = progressList.FirstOrDefault(p => p.UserId == enrollment.UserId);
+                CourseProgressList.Add(new CourseProgressViewModel
+                {
+                    Enrollment = enrollment,
+                    Progress = progress
+                });
+            }
 
             return Page();
         }
     }
 }
-

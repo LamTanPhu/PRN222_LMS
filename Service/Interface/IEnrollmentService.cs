@@ -15,5 +15,7 @@ namespace Service.Interface
         Task CreateAsync(Enrollment enrollment);
         Task<List<Enrollment>> GetEnrollmentsByUserAsync(int userId);
         Task EnrollAsync(int courseId, int userId);
+        Task EnrollAsync(Enrollment enrollment);
+        Task<bool> IsEnrolledAsync(int userId, int courseId);
     }
 }

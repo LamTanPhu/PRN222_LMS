@@ -28,6 +28,22 @@ namespace Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Enrollment?> GetByUserAndCourseAsync(int userId, int courseId)
+        {
+            return await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
+        }
+
+        public async Task AddEnrollmentAsync(Enrollment enrollment)
+        {
+            var existing = await GetByUserAndCourseAsync(enrollment.UserId, enrollment.CourseId);
+            if (existing == null)
+            {
+                await _context.Enrollments.AddAsync(enrollment);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<Enrollment> GetByIdAsync(int id)
         {
             return await _context.Enrollments

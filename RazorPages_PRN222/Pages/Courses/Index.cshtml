@@ -38,11 +38,22 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <div class="btn-group" role="group">
-                                <form method="post" asp-page-handler="Enroll" asp-route-courseId="@course.CourseId" style="display: inline;">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-graduation-cap"></i> Enroll
-                                    </button>
-                                </form>
+                                @if (course.Enrollments.Where(e => int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value) == e.UserId && course.CourseId == e.CourseId).FirstOrDefault() != null)
+                                {
+                                    <form method="post" asp-page="/Courses/Details" asp-route-id="@course.CourseId" style="display: inline;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-graduation-cap"></i> Study
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-page-handler="Enroll" asp-route-courseId="@course.CourseId" style="display: inline;">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-graduation-cap"></i> Enroll
+                                        </button>
+                                    </form>
+                                }                                
                                 <form method="post" asp-page-handler="Wishlist" asp-route-courseId="@course.CourseId" style="display:inline;">
                                     @if (Model.WishlistCourseIds.Contains(course.CourseId))
                                     {

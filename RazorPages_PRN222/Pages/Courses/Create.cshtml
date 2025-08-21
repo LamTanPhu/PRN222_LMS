@@ -4,112 +4,111 @@
 <h2>Create a New Course</h2>
 
 <form method="post">
-    <div class="form-group">
-        <label asp-for="CourseVM.Title" class="control-label"></label>
-        <input asp-for="CourseVM.Title" class="form-control" />
-        <span asp-validation-for="CourseVM.Title" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="CourseVM.Description" class="control-label"></label>
-        <textarea asp-for="CourseVM.Description" class="form-control"></textarea>
-        <span asp-validation-for="CourseVM.Description" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="CourseVM.CategoryId" class="control-label">Category</label>
-        @if (Model.Categories?.Count > 0)
-        {
-            <select asp-for="CourseVM.CategoryId" class="form-control" asp-items="@(new SelectList(Model.Categories, nameof(Category.CategoryId), nameof(Category.Name)))">
-                <option value="">Select a category</option>
-            </select>
-        }
-        else
-        {
-            <select asp-for="CourseVM.CategoryId" class="form-control" disabled>
-                <option value="">No categories available</option>
-            </select>
-        }
-        <span asp-validation-for="CourseVM.CategoryId" class="text-danger"></span>
-    </div>
-
-    <h3>Lessons</h3>
-    <div id="lessons-container">
-        <div class="form-group lesson-group" data-lesson-index="0">
-            <label class="control-label">Lesson Title</label>
-            <input type="text" name="CourseVM.Lessons[0].Title" class="form-control" />
-            <label class="control-label">Lesson Content</label>
-            <textarea name="CourseVM.Lessons[0].Content" class="form-control"></textarea>
-            <h4>Quizzes for this Lesson</h4>
-            <div class="quizzes-container">
-                <div class="form-group quiz-group">
-                    <label class="control-label">Quiz Title</label>
-                    <input type="text" name="CourseVM.Lessons[0].Quizzes[0].Title" class="form-control" />
-                    <label class="control-label">Quiz Description</label>
-                    <textarea name="CourseVM.Lessons[0].Quizzes[0].Description" class="form-control"></textarea>
-                </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.Title" class="control-label">Course Title *</label>
+                <input asp-for="CourseVM.Title" class="form-control" />
+                <span asp-validation-for="CourseVM.Title" class="text-danger"></span>
             </div>
-            <button type="button" class="btn btn-secondary add-quiz">Add Quiz</button>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.Subtitle" class="control-label">Subtitle</label>
+                <input asp-for="CourseVM.Subtitle" class="form-control" />
+                <span asp-validation-for="CourseVM.Subtitle" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.Description" class="control-label">Description *</label>
+                <textarea asp-for="CourseVM.Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="CourseVM.Description" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.CategoryId" class="control-label">Category *</label>
+                @if (Model.Categories?.Count > 0)
+                {
+                    <select asp-for="CourseVM.CategoryId" class="form-control">
+                        <option value="">Select a category</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.CategoryId">@category.Name</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <select asp-for="CourseVM.CategoryId" class="form-control" disabled>
+                        <option value="">No categories available</option>
+                    </select>
+                }
+                <span asp-validation-for="CourseVM.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.InstructorId" class="control-label">Instructor *</label>
+                @if (Model.Instructors?.Count > 0)
+                {
+                    <select asp-for="CourseVM.InstructorId" class="form-control">
+                        <option value="">Select an instructor</option>
+                        @foreach (var instructor in Model.Instructors)
+                        {
+                            <option value="@instructor.UserId">@instructor.Username</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <select asp-for="CourseVM.InstructorId" class="form-control" disabled>
+                        <option value="">No instructors available</option>
+                    </select>
+                }
+                <span asp-validation-for="CourseVM.InstructorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.DifficultyLevel" class="control-label">Difficulty Level</label>
+                <select asp-for="CourseVM.DifficultyLevel" class="form-control">
+                    <option value="">Select difficulty</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+                <span asp-validation-for="CourseVM.DifficultyLevel" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.Language" class="control-label">Language</label>
+                <input asp-for="CourseVM.Language" class="form-control" placeholder="e.g., English" />
+                <span asp-validation-for="CourseVM.Language" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="CourseVM.Price" class="control-label">Price *</label>
+                <input asp-for="CourseVM.Price" class="form-control" type="number" step="0.01" min="0" />
+                <span asp-validation-for="CourseVM.Price" class="text-danger"></span>
+            </div>
         </div>
     </div>
-    <button type="button" id="add-lesson" class="btn btn-secondary">Add Lesson</button>
 
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
+    <div class="form-group mt-4">
+        <input type="submit" value="Create Course" class="btn btn-primary" />
+        <a asp-page="/Admin/Courses" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 
+<div class="alert alert-info mt-4">
+    <h5><i class="fas fa-info-circle me-2"></i>Next Steps</h5>
+    <p>After creating your course, you can:</p>
+    <ul>
+        <li>Add lessons through the <a href="/Admin/Lessons">Lessons Management</a> page</li>
+        <li>Create quizzes through the <a href="/Admin/Quizzes">Quizzes Management</a> page</li>
+        <li>Manage your course content from the <a href="/Admin/Courses">Courses Management</a> page</li>
+    </ul>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        let lessonIndex = 1;
-
-        document.getElementById('add-lesson').addEventListener('click', () => {
-            const container = document.getElementById('lessons-container');
-            const newGroup = document.createElement('div');
-            newGroup.className = 'form-group lesson-group';
-            newGroup.setAttribute('data-lesson-index', lessonIndex);
-            newGroup.innerHTML = `
-                        <label class="control-label">Lesson Title</label>
-                        <input type="text" name="CourseVM.Lessons[${lessonIndex}].Title" class="form-control" />
-                        <label class="control-label">Lesson Content</label>
-                        <textarea name="CourseVM.Lessons[${lessonIndex}].Content" class="form-control"></textarea>
-                        <h4>Quizzes for this Lesson</h4>
-                        <div class="quizzes-container">
-                            <div class="form-group quiz-group">
-                                <label class="control-label">Quiz Title</label>
-                                <input type="text" name="CourseVM.Lessons[${lessonIndex}].Quizzes[0].Title" class="form-control" />
-                                <label class="control-label">Quiz Description</label>
-                                <textarea name="CourseVM.Lessons[${lessonIndex}].Quizzes[0].Description" class="form-control"></textarea>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-secondary add-quiz">Add Quiz</button>
-                        <button type="button" class="btn btn-danger remove-lesson">Remove Lesson</button>
-                    `;
-            container.appendChild(newGroup);
-            attachQuizEvent(newGroup);
-            newGroup.querySelector('.remove-lesson').addEventListener('click', () => newGroup.remove());
-            lessonIndex++;
-        });
-
-        function attachQuizEvent(lessonGroup) {
-            const lessonIdx = lessonGroup.getAttribute('data-lesson-index');
-            let quizIndex = 1;
-            lessonGroup.querySelector('.add-quiz').addEventListener('click', () => {
-                const quizzesContainer = lessonGroup.querySelector('.quizzes-container');
-                const newQuizGroup = document.createElement('div');
-                newQuizGroup.className = 'form-group quiz-group';
-                newQuizGroup.innerHTML = `
-                            <label class="control-label">Quiz Title</label>
-                            <input type="text" name="CourseVM.Lessons[${lessonIdx}].Quizzes[${quizIndex}].Title" class="form-control" />
-                            <label class="control-label">Quiz Description</label>
-                            <textarea name="CourseVM.Lessons[${lessonIdx}].Quizzes[${quizIndex}].Description" class="form-control"></textarea>
-                            <button type="button" class="btn btn-danger remove-quiz">Remove Quiz</button>
-                        `;
-                quizzesContainer.appendChild(newQuizGroup);
-                newQuizGroup.querySelector('.remove-quiz').addEventListener('click', () => newQuizGroup.remove());
-                quizIndex++;
-            });
-        }
-
-        document.querySelectorAll('.lesson-group').forEach(attachQuizEvent);
-    </script>
 }

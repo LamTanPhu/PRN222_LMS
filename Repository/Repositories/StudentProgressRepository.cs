@@ -85,5 +85,48 @@ namespace Repository.Repositories
                 .Where(sp => sp.UserId == userId)
                 .ToListAsync();
         }
+        public async Task<object> GetCourseProgressAsync(int userId, int courseId)
+        {
+            // Enrollment record
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
+
+            if (enrollment == null)
+                return new { Message = "Student not enrolled in this course." };
+
+            // Total lessons
+            var totalLessons = await _context.Lessons
+                .CountAsync(l => l.CourseId == courseId);
+
+            // Completed lessons
+            var completedLessons = await _context.StudentProgresses
+                .CountAsync(p => p.UserId == userId
+                              && p.CourseId == courseId
+                              && p.IsCompleted == true);
+
+            // Progress percentage
+            decimal progressPercentage = totalLessons > 0
+                ? Math.Round((decimal)completedLessons / totalLessons * 100, 2)
+                : 0;
+
+            // Update enrollment progress
+            enrollment.ProgressPercentage = progressPercentage;
+            enrollment.LastAccessedAt = DateTime.UtcNow;
+            if (progressPercentage == 100)
+                enrollment.CompletionDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                CourseId = courseId,
+                UserId = userId,
+                Progress = progressPercentage,
+                CompletedLessons = completedLessons,
+                TotalLessons = totalLessons,
+                Status = enrollment.Status ?? (progressPercentage == 100 ? "Completed" : "In Progress")
+            };
+        }
+
     }
 }

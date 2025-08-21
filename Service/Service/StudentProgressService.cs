@@ -47,5 +47,10 @@ namespace Service.Service
         {
             return await studentProgressRepository.GetStudentProgressesByUserAsync(userId);
         }
+
+        public async Task<object> GetCourseProgressAsync(int userId, int courseId)
+        {
+            return await studentProgressRepository.GetCourseProgressAsync(userId, courseId);
+        }
     }
 }

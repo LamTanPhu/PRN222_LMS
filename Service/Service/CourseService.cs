@@ -4,6 +4,7 @@ using Service.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +27,11 @@ namespace Service.Service
         public async Task<Course> GetByIdAsync(int? id)
         {
             return await courseRepository.GetByIdAsync(id ?? 0);
+        }
+
+        public async Task<List<Course>> GetCoursesForAdminAsync()
+        {
+            return await courseRepository.GetCoursesForAdminAsync();
         }
 
         public async Task<bool> DeleteAsync(int? id)

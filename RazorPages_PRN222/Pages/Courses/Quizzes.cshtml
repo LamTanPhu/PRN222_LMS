@@ -1,0 +1,183 @@
+@page "{id:int}"
+@model RazorPages_PRN222.Pages.Courses.QuizzesModel
+@{
+    ViewData["Title"] = "Course Quizzes";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>
+                    Quizzes - @Model.CourseTitle
+                </h2>
+                <a asp-page="/Courses/Details" asp-route-id="@Model.CourseId" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Course
+                </a>
+            </div>
+
+            @if (!Model.Quizzes.Any())
+            {
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-question-circle fa-3x mb-3 text-muted"></i>
+                    <h4>No quizzes available yet</h4>
+                    <p class="text-muted">Quizzes for this course will be added soon.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var quiz in Model.Quizzes)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 quiz-card shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="card-title mb-0">@quiz.Title</h5>
+                                        @if (quiz.IsRandomized == true)
+                                        {
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-random me-1"></i>Randomized
+                                            </span>
+                                        }
+                                    </div>
+                                    
+                                    <p class="card-text text-muted mb-3">
+                                        @(string.IsNullOrEmpty(quiz.Description) ? "No description available" : quiz.Description)
+                                    </p>
+                                    
+                                    <div class="quiz-stats mb-3">
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <div class="stat-value text-primary">@(quiz.TimeLimit ?? 0)</div>
+                                                    <div class="stat-label">Minutes</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <div class="stat-value text-success">@(quiz.PassingScore ?? 0)%</div>
+                                                    <div class="stat-label">Pass Score</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="stat-item">
+                                                    <div class="stat-value text-warning">@(quiz.MaxAttempts ?? 0)</div>
+                                                    <div class="stat-label">Attempts</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted small">
+                                            <i class="fas fa-list me-1"></i>
+                                            @(quiz.QuizQuestions?.Count ?? 0) Questions
+                                        </span>
+                                        
+                                        @{
+                                            var attemptCount = Model.StudentAttempts?.Count(a => a.QuizId == quiz.QuizId) ?? 0;
+                                            var maxAttempts = quiz.MaxAttempts ?? 1;
+                                            var canTakeQuiz = attemptCount < maxAttempts;
+                                        }
+                                        
+                                        @if (canTakeQuiz)
+                                        {
+                                            <button class="btn btn-primary btn-sm" onclick="startQuiz(@quiz.QuizId)">
+                                                <i class="fas fa-play me-1"></i>Start Quiz
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-lock me-1"></i>Max Attempts Reached
+                                            </span>
+                                        }
+                                    </div>
+                                    
+                                    @if (attemptCount > 0)
+                                    {
+                                        <div class="mt-3 pt-3 border-top">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-history me-1"></i>
+                                                    @attemptCount attempt@(attemptCount != 1 ? "s" : "")
+                                                </span>
+                                                <button class="btn btn-outline-info btn-sm" onclick="viewResults(@quiz.QuizId)">
+                                                    <i class="fas fa-chart-bar me-1"></i>View Results
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.quiz-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+}
+
+.quiz-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.quiz-stats {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.border-top {
+    border-color: #e9ecef !important;
+}
+</style>
+
+<script>
+function startQuiz(quizId) {
+    // TODO: Implement quiz taking functionality
+    if (confirm('Are you ready to start this quiz? You cannot pause once started.')) {
+        alert('Starting quiz ' + quizId + '. This would open the quiz interface.');
+    }
+}
+
+function viewResults(quizId) {
+    // TODO: Implement quiz results viewing functionality
+    alert('Viewing results for quiz ' + quizId + '. This would show detailed results.');
+}
+</script>

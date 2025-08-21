@@ -1,16 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Repository.Models;
 using Service.Interface;
+using Service.Service;
 
 namespace RazorPages_PRN222.Pages.Checkout
 {
     public class SuccessModel : PageModel
     {
         private readonly IOrderService _orderService;
+        private readonly IEnrollmentService _enrollmentService;
 
-        public SuccessModel(IOrderService orderService)
+        public SuccessModel(IOrderService orderService, IEnrollmentService enrollmentService)
         {
             _orderService = orderService;
+            _enrollmentService = enrollmentService;
         }
 
         public int OrderId { get; set; }
@@ -38,6 +42,18 @@ namespace RazorPages_PRN222.Pages.Checkout
             OrderId = order.OrderId;
             OrderDate = order.OrderDate ?? DateTime.Now;
             TotalAmount = order.FinalAmount;
+
+            if (order.OrderItems != null && order.OrderItems.Any())
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    await _enrollmentService.EnrollAsync(new Enrollment
+                    {
+                        UserId = userId,
+                        CourseId = item.CourseId,
+                    });
+                }
+            }
 
             return Page();
         }

@@ -19,6 +19,8 @@ public partial class QuizQuestion
 
     public int SortOrder { get; set; }
 
+
+
     public virtual Quiz Quiz { get; set; }
 
     public virtual ICollection<QuizAnswer> QuizAnswers { get; set; } = new List<QuizAnswer>();

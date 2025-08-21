@@ -38,6 +38,18 @@ namespace Service.Service
             return false;
         }
 
+        public async Task<bool> CreateAsync(StudentProgress progress)
+        {
+            var result = await studentProgressRepository.CreateAsync(progress);
+            return result > 0;
+        }
+
+        public async Task<bool> UpdateAsync(StudentProgress progress)
+        {
+            var result = await studentProgressRepository.UpdateAsync(progress);
+            return result > 0;
+        }
+
         public async Task UpdateProgressAsync(int userId, int courseId, int lessonId, bool isCompleted)
         {
             await studentProgressRepository.UpdateAsync(userId, courseId, lessonId, isCompleted);

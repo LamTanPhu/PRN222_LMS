@@ -38,9 +38,10 @@ namespace Service.Service
             return false;
         }
 
-        public async Task CreateAsync(StudentQuizAttempt attempt)
+        public async Task<bool> CreateAsync(StudentQuizAttempt attempt)
         {
-            await studentQuizAttemptRepository.CreateAsync(attempt);
+            var result = await studentQuizAttemptRepository.CreateAsync(attempt);
+            return result > 0;
         }
 
         public async Task RecordAttemptAsync(int userId, int quizId, int score)

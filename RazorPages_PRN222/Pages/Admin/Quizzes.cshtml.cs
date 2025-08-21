@@ -71,5 +71,140 @@ namespace RazorPages_PRN222.Pages.Admin
             await _quizService.DeleteAsync(quizId);
             return RedirectToPage();
         }
+
+        public async Task<IActionResult> OnPostAddSampleQuestionsAsync(int quizId)
+        {
+            // Get the quiz
+            var quiz = await _quizService.GetByIdAsync(quizId);
+            if (quiz == null)
+            {
+                return RedirectToPage();
+            }
+
+            // Get the lesson to determine course context
+            var lesson = await _lessonService.GetByIdAsync(quiz.LessonId);
+            if (lesson == null)
+            {
+                return RedirectToPage();
+            }
+
+            // Add sample questions based on the course
+            var questions = new List<QuizQuestion>();
+
+            if (lesson.CourseId == 1) // Web Development Bootcamp
+            {
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "What does HTML stand for?",
+                    QuestionType = "Multiple Choice",
+                    SortOrder = 1,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "HyperText Markup Language", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "High Tech Modern Language", IsCorrect = false, SortOrder = 2 },
+                        new QuizAnswer { AnswerText = "Home Tool Markup Language", IsCorrect = false, SortOrder = 3 },
+                        new QuizAnswer { AnswerText = "Hyperlink and Text Markup Language", IsCorrect = false, SortOrder = 4 }
+                    }
+                });
+
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "Which CSS property is used to change the text color?",
+                    QuestionType = "Multiple Choice",
+                    SortOrder = 2,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "text-color", IsCorrect = false, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "color", IsCorrect = true, SortOrder = 2 },
+                        new QuizAnswer { AnswerText = "font-color", IsCorrect = false, SortOrder = 3 },
+                        new QuizAnswer { AnswerText = "text-style", IsCorrect = false, SortOrder = 4 }
+                    }
+                });
+
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "JavaScript is a programming language.",
+                    QuestionType = "True/False",
+                    SortOrder = 3,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "True", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "False", IsCorrect = false, SortOrder = 2 }
+                    }
+                });
+            }
+            else if (lesson.CourseId == 2) // Digital Marketing Masterclass
+            {
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "What does SEO stand for?",
+                    QuestionType = "Multiple Choice",
+                    SortOrder = 1,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "Search Engine Optimization", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "Social Engine Optimization", IsCorrect = false, SortOrder = 2 },
+                        new QuizAnswer { AnswerText = "Search Engine Organization", IsCorrect = false, SortOrder = 3 },
+                        new QuizAnswer { AnswerText = "Social Engine Organization", IsCorrect = false, SortOrder = 4 }
+                    }
+                });
+
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "Email marketing is still effective in digital marketing.",
+                    QuestionType = "True/False",
+                    SortOrder = 2,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "True", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "False", IsCorrect = false, SortOrder = 2 }
+                    }
+                });
+            }
+            else // React.js Advanced Patterns
+            {
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "What is a React Hook?",
+                    QuestionType = "Multiple Choice",
+                    SortOrder = 1,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "A function that lets you use state and other React features", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "A component that hooks into the DOM", IsCorrect = false, SortOrder = 2 },
+                        new QuizAnswer { AnswerText = "A way to connect to external APIs", IsCorrect = false, SortOrder = 3 },
+                        new QuizAnswer { AnswerText = "A debugging tool", IsCorrect = false, SortOrder = 4 }
+                    }
+                });
+
+                questions.Add(new QuizQuestion
+                {
+                    QuizId = quizId,
+                    QuestionText = "useState is a React Hook.",
+                    QuestionType = "True/False",
+                    SortOrder = 2,
+                    QuizAnswers = new List<QuizAnswer>
+                    {
+                        new QuizAnswer { AnswerText = "True", IsCorrect = true, SortOrder = 1 },
+                        new QuizAnswer { AnswerText = "False", IsCorrect = false, SortOrder = 2 }
+                    }
+                });
+            }
+
+            // Add the questions to the database
+            foreach (var question in questions)
+            {
+                await _quizService.AddQuestionToQuizAsync(quizId, question);
+            }
+
+            TempData["Message"] = $"Added {questions.Count} sample questions to the quiz!";
+            return RedirectToPage();
+        }
     }
 }

@@ -1,0 +1,294 @@
+@page
+@model RazorPages_PRN222.Pages.Learning.QuizModel
+@{
+    ViewData["Title"] = "Quiz - " + Model.Quiz?.Title;
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Learning">My Learning</a></li>
+                    <li class="breadcrumb-item"><a href="/Learning/Course/@Model.Course?.CourseId">@Model.Course?.Title</a></li>
+                    <li class="breadcrumb-item"><a href="/Learning/Lesson/@Model.Lesson?.LessonId">@Model.Lesson?.Title</a></li>
+                    <li class="breadcrumb-item active">@Model.Quiz?.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
+                </div>
+            }
+            @if (TempData["Warning"] != null)
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> @TempData["Warning"]
+                </div>
+            }
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> @TempData["Success"]
+                </div>
+            }
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3><i class="fas fa-question-circle"></i> @Model.Quiz?.Title</h3>
+                        <div>
+                            @if (Model.PreviousAttempt != null)
+                            {
+                                <span class="badge @(Model.PreviousAttempt.IsPassed == true ? "bg-success" : "bg-danger") me-2">
+                                    Previous Score: @(Model.PreviousAttempt.Score?.ToString("F1") ?? "0")%
+                                </span>
+                            }
+                            <span class="badge bg-info">@Model.Questions.Count Questions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">@Model.Quiz?.Description</p>
+                    
+                    <!-- Debug Information -->
+                    <div class="alert alert-info">
+                        <strong>Debug Info:</strong><br>
+                        Quiz ID: @Model.Quiz?.QuizId<br>
+                        Quiz Title: @Model.Quiz?.Title<br>
+                        Questions Loaded: @Model.Questions.Count<br>
+                        Quiz Questions Count: @(Model.Quiz?.QuizQuestions?.Count ?? 0)<br>
+                        Lesson ID: @Model.Lesson?.LessonId<br>
+                        Course ID: @Model.Course?.CourseId<br>
+                        @if (Model.Questions.Any())
+                        {
+                            <div class="mt-2">
+                                <strong>Question Details:</strong><br>
+                                @foreach (var question in Model.Questions.Take(3))
+                                {
+                                    <span class="badge bg-secondary me-2 mb-1">
+                                        Q@(question.QuestionId): @question.QuestionType<br>
+                                        <small>Answers: @(question.QuizAnswers?.Count ?? 0)</small>
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.PreviousAttempt?.IsPassed == true)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> You have already passed this quiz! You can retake it if you want.
+                        </div>
+                    }
+
+                    @if (Model.Questions.Count == 0)
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>No questions available for this quiz!</strong><br>
+                            <small class="text-muted">
+                                Quiz ID: @Model.Quiz?.QuizId | 
+                                Questions in DB: @(Model.Quiz?.QuizQuestions?.Count ?? 0) | 
+                                Questions Loaded: @Model.Questions.Count
+                            </small>
+                        </div>
+                        
+                        <!-- Test Button to Load Questions -->
+                        <div class="alert alert-info">
+                            <strong>Debug Action:</strong><br>
+                            <form method="post" asp-page-handler="TestLoadQuestions" class="d-inline">
+                                <input type="hidden" name="quizId" value="@Model.Quiz?.QuizId" />
+                                <button type="submit" class="btn btn-info btn-sm">
+                                    <i class="fas fa-sync"></i> Test Load Questions
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Lesson
+                            </a>
+                            <a href="/Learning/Course/@Model.Course?.CourseId" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Back to Course
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <form method="post" id="quizForm">
+                            <input type="hidden" name="quizId" value="@Model.Quiz?.QuizId" />
+                            
+                            @for (int i = 0; i < Model.Questions.Count; i++)
+                        {
+                            var question = Model.Questions[i];
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5>Question @(i + 1): @question.QuestionText</h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (question.QuestionType == "Multiple Choice")
+                                    {
+                                        @foreach (var answer in question.QuizAnswers)
+                                        {
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" 
+                                                                                                               name="answers[@question.QuestionId]" 
+                                                        value="@answer.AnswerId" 
+                                                        id="answer@(answer.AnswerId)" required>
+                                                <label class="form-check-label" for="answer@(answer.AnswerId)">
+                                                    @answer.AnswerText
+                                                </label>
+                                            </div>
+                                        }
+                                    }
+                                    else if (question.QuestionType == "True/False")
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                                                                       name="answers[@question.QuestionId]" 
+                                                    value="true" id="true@(question.QuestionId)" required>
+                                                                                         <label class="form-check-label" for="true@(question.QuestionId)">
+                                                True
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" 
+                                                                                                       name="answers[@question.QuestionId]" 
+                                                    value="false" id="false@(question.QuestionId)" required>
+                                                                                         <label class="form-check-label" for="false@(question.QuestionId)">
+                                                False
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Lesson
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitQuiz">
+                                <i class="fas fa-paper-plane"></i> Submit Quiz
+                            </button>
+                        </div>
+                    </form>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Quiz Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Questions:</strong> @Model.Questions.Count</li>
+                        <li><strong>Time Limit:</strong> @(Model.Quiz?.TimeLimit ?? 0) minutes</li>
+                        <li><strong>Passing Score:</strong> @(Model.Quiz?.PassingScore ?? 70)%</li>
+                        <li><strong>Attempts:</strong> @(Model.PreviousAttempt?.AttemptNumber ?? 0)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Timer</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div id="timer" class="h3 text-primary">--:--</div>
+                    <small class="text-muted">Time remaining</small>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Question Navigation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-1" id="questionNav">
+                        @for (int i = 0; i < Model.Questions.Count; i++)
+                        {
+                            <button type="button" class="btn btn-outline-primary btn-sm question-nav" data-question="@(i + 1)">
+                                @(i + 1)
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Timer functionality
+    let timeLeft = @(Model.Quiz?.TimeLimit ?? 0) * 60; // Convert to seconds
+    const timerElement = document.getElementById('timer');
+    const submitButton = document.getElementById('submitQuiz');
+    const quizForm = document.getElementById('quizForm');
+
+    function updateTimer() {
+        if (timeLeft <= 0) {
+            timerElement.textContent = '00:00';
+            timerElement.className = 'h3 text-danger';
+            alert('Time is up! Submitting quiz automatically.');
+            quizForm.submit();
+            return;
+        }
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 60) { // Last minute
+            timerElement.className = 'h3 text-danger';
+        }
+        
+        timeLeft--;
+    }
+
+    if (timeLeft > 0) {
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    }
+
+    // Question navigation
+    document.querySelectorAll('.question-nav').forEach(button => {
+        button.addEventListener('click', function() {
+            const questionNumber = this.getAttribute('data-question');
+            const questionElement = document.querySelectorAll('.card')[questionNumber]; // +1 for header card
+            questionElement.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Form validation
+    quizForm.addEventListener('submit', function(e) {
+        const questions = @Model.Questions.Count;
+        let answered = 0;
+        
+        for (let i = 0; i < questions; i++) {
+                         const questionId = @Model.Questions.First().QuestionId + i;
+            const answers = document.querySelectorAll(`input[name="answers[${questionId}]"]:checked`);
+            if (answers.length > 0) {
+                answered++;
+            }
+        }
+        
+        if (answered < questions) {
+            e.preventDefault();
+            alert(`Please answer all ${questions} questions before submitting.`);
+            return false;
+        }
+        
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    });
+</script>

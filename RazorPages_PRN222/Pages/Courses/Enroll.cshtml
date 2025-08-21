@@ -1,0 +1,92 @@
+@page
+@model RazorPages_PRN222.Pages.Courses.EnrollModel
+@{
+    ViewData["Title"] = "Enroll in Course";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Enroll in Course</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.Course != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                                                 <img src="@Model.Course.CourseImage" class="img-fluid rounded" alt="@Model.Course.Title" />
+                            </div>
+                            <div class="col-md-8">
+                                <h4>@Model.Course.Title</h4>
+                                <p class="text-muted">@Model.Course.Description</p>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Duration:</strong> @Model.Course.EstimatedDuration hours
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Price:</strong> $@Model.Course.Price
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <strong>Instructor:</strong> @Model.Course.Instructor?.FullName
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>Category:</strong> @Model.Course.Category?.Name
+                                    </div>
+                                </div>
+
+                                @if (Model.IsEnrolled)
+                                {
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-check-circle"></i> You are already enrolled in this course!
+                                        <a href="/Courses/Details/@Model.CourseId" class="btn btn-primary ms-2">Continue Learning</a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <form method="post">
+                                        <input type="hidden" asp-for="CourseId" />
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-graduation-cap"></i> Enroll Now
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            Course not found.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Course Details</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Course != null)
+                    {
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-book"></i> @Model.LessonCount Lessons</li>
+                            <li><i class="fas fa-question-circle"></i> @Model.QuizCount Quizzes</li>
+                            <li><i class="fas fa-users"></i> @Model.EnrollmentCount Students</li>
+                            <li><i class="fas fa-star"></i> @Model.AverageRating.ToString("F1") Rating</li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

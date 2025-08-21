@@ -12,7 +12,7 @@ namespace Service.Interface
         Task<List<StudentQuizAttempt>> GetAllAsync();
         Task<StudentQuizAttempt> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
-        Task CreateAsync(StudentQuizAttempt attempt);
+        Task<bool> CreateAsync(StudentQuizAttempt attempt);
         Task RecordAttemptAsync(int userId, int quizId, int score);
         Task<List<StudentQuizAttempt>> GetAttemptsByUserAsync(int userId);
     }

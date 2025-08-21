@@ -20,7 +20,23 @@ namespace Service.Service
 
         public async Task<List<Quiz>> GetAllAsync()
         {
-            return await quizRepository.GetAllAsync();
+            var quizzes = await quizRepository.GetAllAsync();
+            
+            // Debug: Log quiz information
+            System.Diagnostics.Debug.WriteLine($"QuizService.GetAllAsync - Found {quizzes.Count} quizzes");
+            foreach (var quiz in quizzes.Take(5)) // Log first 5 quizzes
+            {
+                System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title}, Questions: {quiz.QuizQuestions?.Count ?? 0}");
+                if (quiz.QuizQuestions != null)
+                {
+                    foreach (var question in quiz.QuizQuestions.Take(3)) // Log first 3 questions
+                    {
+                        System.Diagnostics.Debug.WriteLine($"    Question {question.QuestionId}: {question.QuestionText}, Answers: {question.QuizAnswers?.Count ?? 0}");
+                    }
+                }
+            }
+            
+            return quizzes;
         }
 
         public async Task<Quiz> GetByIdAsync(int? id)
@@ -30,7 +46,27 @@ namespace Service.Service
 
         public async Task<Quiz> GetByIdAsync(int id)
         {
-            return await quizRepository.GetByIdAsync(id);
+            var quiz = await quizRepository.GetByIdAsync(id);
+            
+            // Debug: Log quiz information
+            if (quiz != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"QuizService.GetByIdAsync - Quiz ID: {quiz.QuizId}, Title: {quiz.Title}");
+                System.Diagnostics.Debug.WriteLine($"Quiz.QuizQuestions count: {quiz.QuizQuestions?.Count ?? 0}");
+                if (quiz.QuizQuestions != null)
+                {
+                    foreach (var question in quiz.QuizQuestions)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"  Question: {question.QuestionText}, Answers: {question.QuizAnswers?.Count ?? 0}");
+                    }
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"QuizService.GetByIdAsync - Quiz with ID {id} not found");
+            }
+            
+            return quiz;
         }
 
         public async Task<bool> CreateAsync(Quiz quiz)
@@ -68,6 +104,37 @@ namespace Service.Service
         {
             quiz.LessonId = lessonId;
             await quizRepository.CreateAsync(quiz);
+        }
+
+        public async Task<bool> AddQuestionToQuizAsync(int quizId, QuizQuestion question)
+        {
+            try
+            {
+                var context = new Repository.DBContext.CourseraStyleLMSContext();
+                
+                // Set the quiz ID for the question
+                question.QuizId = quizId;
+                
+                // Add the question
+                context.QuizQuestions.Add(question);
+                
+                // Add the answers
+                if (question.QuizAnswers != null)
+                {
+                    foreach (var answer in question.QuizAnswers)
+                    {
+                        answer.QuestionId = question.QuestionId;
+                        context.QuizAnswers.Add(answer);
+                    }
+                }
+                
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -48,12 +48,16 @@ namespace Service.Service
         }
         public async Task<List<QuizQuestion>> GetByQuizIdAsync(int quizId)
         {
-            var context = new Repository.DBContext.CourseraStyleLMSContext();
-            return await context.QuizQuestions
-                .Where(q => q.QuizId == quizId)
-                .Include(q => q.QuizAnswers)
-                .ToListAsync();
-
+            var questions = await quizQuestionRepository.GetByQuizIdAsync(quizId);
+            
+            // Debug: Log question information
+            System.Diagnostics.Debug.WriteLine($"QuizQuestionService.GetByQuizIdAsync - Quiz ID: {quizId}, Found {questions.Count} questions");
+            foreach (var question in questions.Take(3))
+            {
+                System.Diagnostics.Debug.WriteLine($"  Question {question.QuestionId}: {question.QuestionText}, Type: {question.QuestionType}, Answers: {question.QuizAnswers?.Count ?? 0}");
+            }
+            
+            return questions;
         }
 
         public async Task<bool> DeleteAsync(int? id)

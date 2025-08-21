@@ -171,7 +171,9 @@ namespace RazorPages_PRN222.Pages.Learning
                 TotalLessons = AllLessons.Count;
 
                 // Debug: Log lesson information
+                System.Diagnostics.Debug.WriteLine($"=== LESSON DATA DEBUG ===");
                 System.Diagnostics.Debug.WriteLine($"Lesson {lessonId}: Found {AllLessons.Count} lessons in course {Lesson.CourseId}");
+                System.Diagnostics.Debug.WriteLine($"Current Lesson: {Lesson.Title} (ID: {Lesson.LessonId}, CourseId: {Lesson.CourseId})");
 
                 // Get current lesson index
                 var currentIndex = AllLessons.FindIndex(l => l.LessonId == lessonId);
@@ -210,45 +212,61 @@ namespace RazorPages_PRN222.Pages.Learning
                     await _studentProgressService.UpdateAsync(Progress);
                 }
 
-                // Get quizzes for this lesson - try to load with questions
+                // Get quizzes for this lesson
                 var allQuizzes = await _quizService.GetAllAsync();
                 Quizzes = allQuizzes.Where(q => q.LessonId == lessonId).ToList();
 
                 // Debug: Log quiz information
+                System.Diagnostics.Debug.WriteLine($"=== QUIZ DEBUG ===");
                 System.Diagnostics.Debug.WriteLine($"Lesson {lessonId}: Found {Quizzes.Count} quizzes");
+                
                 foreach (var quiz in Quizzes)
                 {
-                    System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title}, Questions: {quiz.QuizQuestions?.Count ?? 0}");
+                    System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title} (LessonId: {quiz.LessonId})");
                     
-                    // If quiz doesn't have questions loaded, try to load them manually
-                    if (quiz.QuizQuestions == null || quiz.QuizQuestions.Count == 0)
+                    // Always try to load questions manually for each quiz
+                    try
                     {
-                        System.Diagnostics.Debug.WriteLine($"    Quiz {quiz.QuizId} has no questions, trying to load manually...");
-                        try
+                        System.Diagnostics.Debug.WriteLine($"    Loading questions for quiz {quiz.QuizId}...");
+                        var manualQuestions = await _quizQuestionService.GetByQuizIdAsync(quiz.QuizId);
+                        
+                        if (manualQuestions != null && manualQuestions.Count > 0)
                         {
-                            var manualQuestions = await _quizQuestionService.GetByQuizIdAsync(quiz.QuizId);
-                            if (manualQuestions != null && manualQuestions.Count > 0)
+                            System.Diagnostics.Debug.WriteLine($"    ✓ Successfully loaded {manualQuestions.Count} questions for quiz {quiz.QuizId}");
+                            quiz.QuizQuestions = manualQuestions;
+                            
+                            // Load answers for each question
+                            foreach (var question in quiz.QuizQuestions)
                             {
-                                System.Diagnostics.Debug.WriteLine($"    Successfully loaded {manualQuestions.Count} questions manually for quiz {quiz.QuizId}");
-                                // Update the quiz object with manually loaded questions
-                                quiz.QuizQuestions = manualQuestions;
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine($"    No questions found manually for quiz {quiz.QuizId}");
+                                System.Diagnostics.Debug.WriteLine($"      Question {question.QuestionId}: {question.QuestionText.Substring(0, Math.Min(50, question.QuestionText.Length))}...");
+                                System.Diagnostics.Debug.WriteLine($"        Type: {question.QuestionType}, Points: {question.Points}");
+                                
+                                // Try to load answers if available
+                                if (question.QuizAnswers == null || question.QuizAnswers.Count == 0)
+                                {
+                                    // You might need to implement GetByQuestionIdAsync in QuizAnswerService
+                                    System.Diagnostics.Debug.WriteLine($"        No answers loaded for question {question.QuestionId}");
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"        Answers: {question.QuizAnswers.Count}");
+                                    foreach (var answer in question.QuizAnswers)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine($"          Answer {answer.AnswerId}: {answer.AnswerText} (Correct: {answer.IsCorrect})");
+                                    }
+                                }
                             }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            System.Diagnostics.Debug.WriteLine($"    Error loading questions for quiz {quiz.QuizId}: {ex.Message}");
+                            System.Diagnostics.Debug.WriteLine($"    ✗ No questions found for quiz {quiz.QuizId}");
+                            quiz.QuizQuestions = new List<QuizQuestion>();
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        foreach (var question in quiz.QuizQuestions)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"    Question {question.QuestionId}: {question.QuestionText}, Answers: {question.QuizAnswers?.Count ?? 0}");
-                        }
+                        System.Diagnostics.Debug.WriteLine($"    ✗ Error loading questions for quiz {quiz.QuizId}: {ex.Message}");
+                        quiz.QuizQuestions = new List<QuizQuestion>();
                     }
                 }
 
@@ -260,6 +278,10 @@ namespace RazorPages_PRN222.Pages.Learning
                 var courseProgress = allProgress.Where(p => p.UserId == userId && p.CourseId == Lesson.CourseId).ToList();
                 CompletedLessons = courseProgress.Count(p => p.IsCompleted == true);
                 CourseProgress = TotalLessons > 0 ? (int)((decimal)CompletedLessons / TotalLessons * 100) : 0;
+                
+                System.Diagnostics.Debug.WriteLine($"=== PROGRESS DEBUG ===");
+                System.Diagnostics.Debug.WriteLine($"Completed Lessons: {CompletedLessons}/{TotalLessons} ({CourseProgress}%)");
+                System.Diagnostics.Debug.WriteLine($"Quiz Attempts: {QuizAttempts.Count}");
             }
             catch (Exception ex)
             {

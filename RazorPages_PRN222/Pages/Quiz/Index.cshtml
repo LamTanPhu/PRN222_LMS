@@ -12,6 +12,32 @@
                     <h1 class="mb-0">Quiz: @Model.CourseTitle</h1>
                 </div>
                 <div class="card-body">
+                    <!-- Debug Information -->
+                    <div class="alert alert-info mb-4">
+                        <strong>Debug Info:</strong><br>
+                        Course ID: @Model.CourseId<br>
+                        Course Title: @Model.CourseTitle<br>
+                        Quiz ID: @(Model.Quiz?.QuizId ?? 0)<br>
+                        Quiz Title: @(Model.Quiz?.Title ?? "No Quiz")<br>
+                        Questions Loaded: @(Model.Questions?.Count ?? 0)<br>
+                        @if (Model.Quiz != null)
+                        {
+                            <span class="badge bg-info">Quiz Found</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">No Quiz Found</span>
+                        }
+                        @if (Model.Questions?.Count > 0)
+                        {
+                            <span class="badge bg-success">Questions Loaded</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">No Questions</span>
+                        }
+                    </div>
+
                     @if (Model.Quiz != null && Model.Questions.Any())
                     {
                         <form method="post">

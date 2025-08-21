@@ -22,20 +22,58 @@ namespace Repository.Repositories
 
         public async Task<List<Quiz>> GetAllAsync()
         {
-            return await _context.Quizzes
+            var quizzes = await _context.Quizzes
                 .Include(q => q.Lesson)
                     .ThenInclude(l => l.Course)
-                .AsNoTracking()
+                .Include(q => q.QuizQuestions)
+                    .ThenInclude(qq => qq.QuizAnswers)
                 .ToListAsync();
+            
+            // Debug: Log quiz information
+            System.Diagnostics.Debug.WriteLine($"QuizRepository.GetAllAsync - Found {quizzes.Count} quizzes");
+            foreach (var quiz in quizzes.Take(3)) // Log first 3 quizzes
+            {
+                System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title}, Questions: {quiz.QuizQuestions?.Count ?? 0}");
+                if (quiz.QuizQuestions != null)
+                {
+                    foreach (var question in quiz.QuizQuestions.Take(2)) // Log first 2 questions
+                    {
+                        System.Diagnostics.Debug.WriteLine($"    Question {question.QuestionId}: {question.QuestionText}, Answers: {question.QuizAnswers?.Count ?? 0}");
+                    }
+                }
+            }
+            
+            return quizzes;
         }
 
         public async Task<Quiz> GetByIdAsync(int id)
         {
-            return await _context.Quizzes
+            var quiz = await _context.Quizzes
                 .Include(q => q.Lesson)
                     .ThenInclude(l => l.Course)
-                .AsNoTracking()
+                .Include(q => q.QuizQuestions)
+                    .ThenInclude(qq => qq.QuizAnswers)
                 .FirstOrDefaultAsync(q => q.QuizId == id);
+            
+            // Debug: Log quiz information
+            if (quiz != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"QuizRepository.GetByIdAsync - Quiz ID: {quiz.QuizId}, Title: {quiz.Title}");
+                System.Diagnostics.Debug.WriteLine($"Quiz.QuizQuestions count: {quiz.QuizQuestions?.Count ?? 0}");
+                if (quiz.QuizQuestions != null)
+                {
+                    foreach (var question in quiz.QuizQuestions)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"  Question {question.QuestionId}: {question.QuestionText}, Answers: {question.QuizAnswers?.Count ?? 0}");
+                    }
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"QuizRepository.GetByIdAsync - Quiz with ID {id} not found");
+            }
+            
+            return quiz;
         }
 
         public async Task<int> CreateAsync(Quiz entity)

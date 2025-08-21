@@ -1,0 +1,217 @@
+@page
+@model RazorPages_PRN222.Pages.Learning.CourseModel
+@{
+    ViewData["Title"] = "Learning - " + Model.Course?.Title;
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Learning">My Learning</a></li>
+                    <li class="breadcrumb-item active">@Model.Course?.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-book"></i> @Model.Course?.Title</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">@Model.Course?.Description</p>
+                    
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: @(Model.Enrollment?.ProgressPercentage ?? 0)%" 
+                             aria-valuenow="@(Model.Enrollment?.ProgressPercentage ?? 0)" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            @(Model.Enrollment?.ProgressPercentage?.ToString("F1") ?? "0")% Complete
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> @Model.Course?.EstimatedDuration hours
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-book"></i> @Model.Lessons.Count Lessons
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <i class="fas fa-question-circle"></i> @Model.Quizzes.Count Quizzes
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Debug Information -->
+                    <div class="alert alert-info">
+                        <strong>Debug Info:</strong><br>
+                        Course ID: @Model.Course?.CourseId<br>
+                        Lessons Loaded: @Model.Lessons.Count<br>
+                        Quizzes Loaded: @Model.Quizzes.Count<br>
+                        @foreach (var quiz in Model.Quizzes.Take(3))
+                        {
+                            <span class="badge bg-secondary me-1">@quiz.Title (@(quiz.QuizQuestions?.Count ?? 0) questions)</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4><i class="fas fa-list"></i> Course Content</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.Lessons.Any())
+                    {
+                        <div class="accordion" id="courseContent">
+                            @for (int i = 0; i < Model.Lessons.Count; i++)
+                            {
+                                var lesson = Model.Lessons[i];
+                                var lessonProgress = Model.LessonProgress.FirstOrDefault(p => p.LessonId == lesson.LessonId);
+                                var lessonQuizzes = Model.Quizzes.Where(q => q.LessonId == lesson.LessonId).ToList();
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading@(i)">
+                                        <button class="accordion-button @(i == 0 ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(i)" aria-expanded="@(i == 0 ? "true" : "false")" aria-controls="collapse@(i)">
+                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                <span>
+                                                    <i class="fas fa-play-circle me-2"></i>
+                                                    @lesson.Title
+                                                </span>
+                                                <span class="badge @(lessonProgress?.IsCompleted == true ? "bg-success" : "bg-warning")">
+                                                    @(lessonProgress?.IsCompleted == true ? "Completed" : "Not Started")
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse@(i)" class="accordion-collapse collapse @(i == 0 ? "show" : "")" aria-labelledby="heading@(i)" data-bs-parent="#courseContent">
+                                        <div class="accordion-body">
+                                            <p class="text-muted">@lesson.Description</p>
+                                            
+                                            <div class="d-flex gap-2 mb-3">
+                                                <a href="/Learning/Lesson/@lesson.LessonId" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-play"></i> Start Lesson
+                                                </a>
+                                                @if (lessonProgress?.IsCompleted == true)
+                                                {
+                                                    <a href="/Learning/Lesson/@lesson.LessonId" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="fas fa-redo"></i> Review
+                                                    </a>
+                                                }
+                                            </div>
+
+                                            @if (lessonQuizzes.Any())
+                                            {
+                                                <h6><i class="fas fa-question-circle"></i> Quizzes:</h6>
+                                                <div class="list-group list-group-flush">
+                                                    @foreach (var quiz in lessonQuizzes)
+                                                    {
+                                                        var quizAttempt = Model.QuizAttempts.FirstOrDefault(a => a.QuizId == quiz.QuizId);
+                                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <span>@quiz.Title</span>
+                                                                <br><small class="text-muted">Questions: @(quiz.QuizQuestions?.Count ?? 0)</small>
+                                                            </div>
+                                                            <div>
+                                                                @if (quizAttempt != null)
+                                                                {
+                                                                    <span class="badge @(quizAttempt.IsPassed == true ? "bg-success" : "bg-danger") me-2">
+                                                                        Score: @(quizAttempt.Score?.ToString("F1") ?? "0")%
+                                                                    </span>
+                                                                }
+                                                                <a href="/Learning/Quiz/@quiz.QuizId" class="btn btn-sm @(quizAttempt?.IsPassed == true ? "btn-outline-success" : "btn-primary")">
+                                                                    @(quizAttempt?.IsPassed == true ? "Retake" : "Take Quiz")
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No lessons available for this course yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Progress Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">@Model.CompletedLessons</h4>
+                            <small class="text-muted">Lessons Completed</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">@Model.PassedQuizzes</h4>
+                            <small class="text-muted">Quizzes Passed</small>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-warning">@Model.TotalLessons</h4>
+                            <small class="text-muted">Total Lessons</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info">@Model.TotalQuizzes</h4>
+                            <small class="text-muted">Total Quizzes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivity.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var activity in Model.RecentActivity)
+                            {
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <small>@activity.Lesson.Title</small>
+                                        <small class="text-muted">@activity.LastAccessedAt?.ToString("MMM dd")</small>
+                                    </div>
+                                    <small class="text-muted">
+                                        @(activity.IsCompleted == true ? "Completed" : "In Progress")
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No recent activity</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

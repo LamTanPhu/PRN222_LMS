@@ -12,6 +12,8 @@ namespace Service.Interface
         Task<List<StudentProgress>> GetAllAsync();
         Task<StudentProgress> GetByIdAsync(int? id);
         Task<bool> DeleteAsync(int? id);
+        Task<bool> CreateAsync(StudentProgress progress);
+        Task<bool> UpdateAsync(StudentProgress progress);
         Task UpdateProgressAsync(int userId, int courseId, int lessonId, bool isCompleted);
         Task<List<StudentProgress>> GetStudentProgressesByUserAsync(int userId);
     }

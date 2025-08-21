@@ -24,6 +24,7 @@ namespace Repository.Repositories
         {
             return await _context.Lessons
                 .Include(l => l.Course)
+                    .ThenInclude(c => c.Instructor)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -32,6 +33,7 @@ namespace Repository.Repositories
         {
             return await _context.Lessons
                 .Include(l => l.Course)
+                    .ThenInclude(c => c.Instructor)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(l => l.LessonId == id);
         }

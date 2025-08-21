@@ -38,20 +38,23 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/MyProfile/Index">My Profile</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-dark dropdown-toggle" href="#" id="learningDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Learning
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="learningDropdown">
-                                <li><a class="dropdown-item" asp-page="/Wishlist/Index">My Wishlist</a></li>
-                                <li><a class="dropdown-item" asp-page="/Progress/Index">My Progress</a></li>
-@*                                 <li><a class="dropdown-item" asp-page="/Quiz/Index">Take Quiz</a></li> *@
-                                <li><a class="dropdown-item" asp-page="/Certificate/Index">My Certificates</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-page="/Forum/Index">Course Forums</a></li>
-                                <li><a class="dropdown-item" asp-page="/Review/Index">Course Reviews</a></li>
-                            </ul>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" id="learningDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Learning
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="learningDropdown">
+                                    <li><a class="dropdown-item" asp-page="/Learning/Index">My Learning</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Progress/Index">My Progress</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Wishlist/Index">My Wishlist</a></li>
+                                    <li><a class="dropdown-item" asp-page="/CertificatePage/Index">My Certificates</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-page="/Forum/Index">Course Forums</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Review/Index">Course Reviews</a></li>
+                                </ul>
+                            </li>
+                        }
 
                         @* <li class="nav-item dropdown">
                             <a class="nav-link text-dark dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -77,7 +80,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
                                     <li><a class="dropdown-item" asp-page="/MyProfile/Index">My Profile</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-page="/Logout">Logout</a></li>
+                                    <li><a class="dropdown-item"  asp-page="/Logout">Logout</a></li>
                                 </ul>
                             </li>
                         }

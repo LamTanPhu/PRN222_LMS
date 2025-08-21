@@ -72,26 +72,38 @@
             
             <div class="course-navigation">
                 <div class="row">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="col-md-3 mb-3">
+                            <a asp-page="/Courses/Enroll" asp-route-id="@Model.CourseId" class="btn btn-success w-100 py-3">
+                                <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                <br>Enroll Now
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-page="/Learning/Course" asp-route-id="@Model.CourseId" class="btn btn-primary w-100 py-3">
+                                <i class="fas fa-play fa-2x mb-2"></i>
+                                <br>Start Learning
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-6 mb-3">
+                            <a asp-page="/Login" class="btn btn-success w-100 py-3">
+                                <i class="fas fa-sign-in-alt fa-2x mb-2"></i>
+                                <br>Login to Enroll
+                            </a>
+                        </div>
+                    }
                     <div class="col-md-3 mb-3">
                         <a asp-page="/Courses/Lessons" asp-route-id="@Model.CourseId" class="btn btn-info w-100 py-3">
                             <i class="fas fa-book-open fa-2x mb-2"></i>
-                            <br>Lessons
+                            <br>View Lessons
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a asp-page="/Courses/Forums" asp-route-id="@Model.CourseId" class="btn btn-warning w-100 py-3">
-                            <i class="fas fa-comments fa-2x mb-2"></i>
-                            <br>Forums
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a asp-page="/Courses/Quizzes" asp-route-id="@Model.CourseId" class="btn btn-success w-100 py-3">
-                            <i class="fas fa-question-circle fa-2x mb-2"></i>
-                            <br>Quizzes
-                        </a>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <a asp-page="/Review/Index" asp-route-courseId="@Model.CourseId" class="btn btn-primary w-100 py-3">
+                        <a asp-page="/Review/Index" asp-route-courseId="@Model.CourseId" class="btn btn-warning w-100 py-3">
                             <i class="fas fa-star fa-2x mb-2"></i>
                             <br>Reviews
                         </a>

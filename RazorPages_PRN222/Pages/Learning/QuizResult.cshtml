@@ -1,0 +1,203 @@
+@page
+@model RazorPages_PRN222.Pages.Learning.QuizResultModel
+@{
+    ViewData["Title"] = "Quiz Result";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Learning">My Learning</a></li>
+                    <li class="breadcrumb-item"><a href="/Learning/Course/@Model.Course?.CourseId">@Model.Course?.Title</a></li>
+                    <li class="breadcrumb-item"><a href="/Learning/Lesson/@Model.Lesson?.LessonId">@Model.Lesson?.Title</a></li>
+                    <li class="breadcrumb-item active">Quiz Result</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Quiz Results</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h4 class="text-primary">@Model.QuizAttempt?.Score?.ToString("F1")%</h4>
+                                    <small class="text-muted">Your Score</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h4 class="text-info">@Model.QuizAttempt?.AttemptNumber</h4>
+                                    <small class="text-muted">Attempt Number</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h4 class="@(Model.QuizAttempt?.IsPassed == true ? "text-success" : "text-danger")">
+                                        @(Model.QuizAttempt?.IsPassed == true ? "PASSED" : "FAILED")
+                                    </h4>
+                                    <small class="text-muted">Result</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.QuizAttempt?.IsPassed == true)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> 
+                            <strong>Congratulations!</strong> You have passed the quiz with a score of @Model.QuizAttempt.Score?.ToString("F1")%.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Keep trying!</strong> You scored @Model.QuizAttempt?.Score?.ToString("F1")%. The passing score is @(Model.Quiz?.PassingScore ?? 70)%.
+                        </div>
+                    }
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Quiz:</strong> @Model.Quiz?.Title
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Passing Score:</strong> @(Model.Quiz?.PassingScore ?? 70)%
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Time Spent:</strong> @(Model.QuizAttempt?.TimeSpent ?? 0) minutes
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Completed:</strong> @Model.QuizAttempt?.CompletedAt?.ToString("MMM dd, yyyy HH:mm")
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h5><i class="fas fa-list"></i> Question Summary</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Your Answer</th>
+                                    <th>Correct Answer</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var result in Model.QuestionResults)
+                                {
+                                    <tr>
+                                        <td>@result.QuestionText</td>
+                                        <td>@result.StudentAnswer</td>
+                                        <td>@result.CorrectAnswer</td>
+                                        <td>
+                                            @if (result.IsCorrect)
+                                            {
+                                                <span class="badge bg-success">Correct</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Incorrect</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-trophy"></i> Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-3">
+                        <div class="progress-bar @(Model.QuizAttempt?.IsPassed == true ? "bg-success" : "bg-danger")" 
+                             role="progressbar" 
+                             style="width: @(Model.QuizAttempt?.Score ?? 0)%" 
+                             aria-valuenow="@(Model.QuizAttempt?.Score ?? 0)" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            @(Model.QuizAttempt?.Score?.ToString("F1") ?? "0")%
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-success">@Model.CorrectAnswers</h5>
+                            <small class="text-muted">Correct</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-danger">@Model.IncorrectAnswers</h5>
+                            <small class="text-muted">Incorrect</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Time Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Time Limit:</strong> @(Model.Quiz?.TimeLimit ?? 0) minutes</li>
+                        <li><strong>Time Used:</strong> @(Model.QuizAttempt?.TimeSpent ?? 0) minutes</li>
+                        <li><strong>Time Remaining:</strong> @(Math.Max(0, (Model.Quiz?.TimeLimit ?? 0) - (Model.QuizAttempt?.TimeSpent ?? 0))) minutes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-arrow-right"></i> Next Steps</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        @if (Model.QuizAttempt?.IsPassed == true)
+                        {
+                            <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-success">
+                                <i class="fas fa-check"></i> Continue to Next Lesson
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Learning/Quiz/@Model.Quiz?.QuizId" class="btn btn-warning">
+                                <i class="fas fa-redo"></i> Retake Quiz
+                            </a>
+                        }
+                        
+                        <a href="/Learning/Course/@Model.Course?.CourseId" class="btn btn-outline-primary">
+                            <i class="fas fa-book"></i> Back to Course
+                        </a>
+                        
+                        <a href="/Learning" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Learning Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

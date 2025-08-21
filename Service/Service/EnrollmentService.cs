@@ -39,14 +39,26 @@ namespace Service.Service
             return false;
         }
 
-        public async Task CreateAsync(Enrollment enrollment)
+        public async Task<bool> CreateAsync(Enrollment enrollment)
         {
-            await enrollmentRepository.CreateAsync(enrollment);
+            var result = await enrollmentRepository.CreateAsync(enrollment);
+            return result > 0;
+        }
+
+        public async Task<bool> UpdateAsync(Enrollment enrollment)
+        {
+            var result = await enrollmentRepository.UpdateAsync(enrollment);
+            return result > 0;
         }
 
         public async Task<List<Enrollment>> GetEnrollmentsByUserAsync(int userId)
         {
             return await enrollmentRepository.GetEnrollmentsByUserAsync(userId);
+        }
+
+        public async Task<Enrollment> GetByUserAndCourseAsync(int userId, int courseId)
+        {
+            return await enrollmentRepository.GetByUserAndCourseAsync(userId, courseId);
         }
 
         public async Task EnrollAsync(Enrollment enrollment)

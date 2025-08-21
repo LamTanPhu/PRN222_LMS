@@ -56,5 +56,14 @@ namespace Repository.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<QuizQuestion>> GetByQuizIdAsync(int quizId)
+        {
+            return await _context.QuizQuestions
+                .Include(qq => qq.QuizAnswers)
+                .Where(qq => qq.QuizId == quizId)
+                .OrderBy(qq => qq.SortOrder)
+                .ToListAsync();
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Repository.Basic;
 using Repository.DBContext;
 using Repository.Models;
+using Repository.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,48 +86,77 @@ namespace Repository.Repositories
                 .Where(sp => sp.UserId == userId)
                 .ToListAsync();
         }
-        public async Task<object> GetCourseProgressAsync(int userId, int courseId)
+        public async Task<CourseProgressDto> GetCourseProgressAsync(int userId, int courseId)
         {
             // Enrollment record
             var enrollment = await _context.Enrollments
+                .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
 
             if (enrollment == null)
-                return new { Message = "Student not enrolled in this course." };
+                return null;
 
-            // Total lessons
-            var totalLessons = await _context.Lessons
+            int totalLessons = await _context.Lessons
                 .CountAsync(l => l.CourseId == courseId);
 
-            // Completed lessons
-            var completedLessons = await _context.StudentProgresses
-                .CountAsync(p => p.UserId == userId
-                              && p.CourseId == courseId
-                              && p.IsCompleted == true);
+            int completedLessons = await _context.Lessons
+                .CountAsync(l => l.CourseId == courseId && l.IsCompleted == true);
 
-            // Progress percentage
+            
             decimal progressPercentage = totalLessons > 0
                 ? Math.Round((decimal)completedLessons / totalLessons * 100, 2)
                 : 0;
 
-            // Update enrollment progress
+            // Update enrollment
             enrollment.ProgressPercentage = progressPercentage;
             enrollment.LastAccessedAt = DateTime.UtcNow;
+            enrollment.Status = progressPercentage == 100 ? "Completed" : "In Progress";
             if (progressPercentage == 100)
                 enrollment.CompletionDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            return new
+            return new CourseProgressDto
             {
                 CourseId = courseId,
                 UserId = userId,
                 Progress = progressPercentage,
                 CompletedLessons = completedLessons,
                 TotalLessons = totalLessons,
-                Status = enrollment.Status ?? (progressPercentage == 100 ? "Completed" : "In Progress")
+                Status = enrollment.Status
             };
+        }
+
+
+        public async Task MarkLessonCompletedAsync(int userId, int courseId, int lessonId)
+        {
+            var progress = await _context.StudentProgresses
+                .FirstOrDefaultAsync(p => p.UserId == userId && p.CourseId == courseId && p.LessonId == lessonId);
+
+            if (progress == null)
+            {
+                // create record if missing
+                progress = new StudentProgress
+                {
+                    UserId = userId,
+                    CourseId = courseId,
+                    LessonId = lessonId,
+                    IsCompleted = true,
+                    CompletedAt = DateTime.UtcNow,
+                    LastAccessedAt = DateTime.UtcNow
+                };
+                _context.StudentProgresses.Add(progress);
+            }
+            else
+            {
+                progress.IsCompleted = true;
+                progress.CompletedAt = DateTime.UtcNow;
+                progress.LastAccessedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
         }
 
     }
 }
+

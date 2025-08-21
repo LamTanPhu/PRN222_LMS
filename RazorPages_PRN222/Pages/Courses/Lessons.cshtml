@@ -75,6 +75,13 @@
                                             <button class="btn btn-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
                                                 <i class="fas fa-play me-1"></i>Start Lesson
                                             </button>
+                                            <form method="post" asp-page-handler="MarkCompleted">
+                                                <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                                <input type="hidden" name="lessonId" value="@lesson.LessonId" />
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-check me-1"></i>Mark Completed
+                                                </button>
+                                            </form>
                                         }
                                     </div>
                                 </div>

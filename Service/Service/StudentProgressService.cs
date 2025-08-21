@@ -1,4 +1,5 @@
 ﻿using Repository.Models;
+using Repository.Models.ViewModel;
 using Repository.Repositories;
 using Service.Interface;
 using System;
@@ -60,9 +61,14 @@ namespace Service.Service
             return await studentProgressRepository.GetStudentProgressesByUserAsync(userId);
         }
 
-        public async Task<object> GetCourseProgressAsync(int userId, int courseId)
+        public async Task<CourseProgressDto> GetCourseProgressAsync(int userId, int courseId)
         {
             return await studentProgressRepository.GetCourseProgressAsync(userId, courseId);
+        }
+
+        public async Task MarkLessonCompletedAsync(int userId, int courseId, int lessonId)
+        {
+            await studentProgressRepository.MarkLessonCompletedAsync(userId, courseId, lessonId);
         }
     }
 }

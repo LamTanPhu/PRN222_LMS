@@ -16,5 +16,8 @@ namespace Service.Interface
         Task<bool> UpdateAsync(StudentProgress progress);
         Task UpdateProgressAsync(int userId, int courseId, int lessonId, bool isCompleted);
         Task<List<StudentProgress>> GetStudentProgressesByUserAsync(int userId);
+
+        Task<object> GetCourseProgressAsync(int userId, int courseId);  
+
     }
 }

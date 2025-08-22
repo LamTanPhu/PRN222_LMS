@@ -24,9 +24,27 @@
                     <h3><i class="fas fa-book"></i> @Model.Course?.Title</h3>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">@Model.Course?.Description</p>
-                    
-                    <!-- Debug Information -->
+                                         <p class="text-muted">@Model.Course?.Description</p>
+                     
+                     <!-- Quiz Overview Section -->
+                     @if (Model.Quizzes.Any())
+                     {
+                         <div class="alert alert-warning border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                             <div class="d-flex align-items-center">
+                                 <div class="flex-grow-1">
+                                     <h5 class="mb-1"><i class="fas fa-question-circle me-2"></i>Course Quizzes Available!</h5>
+                                     <p class="mb-0">This course has @Model.Quizzes.Count quiz(zes) to test your knowledge. Take them after completing each lesson.</p>
+                                 </div>
+                                 <div class="ms-3">
+                                     <a href="#course-quizzes" class="btn btn-light">
+                                         <i class="fas fa-list me-2"></i>View All Quizzes
+                                     </a>
+                                 </div>
+                             </div>
+                         </div>
+                     }
+                     
+                     <!-- Debug Information -->
                     <div class="alert alert-info">
                         <strong>Debug Info:</strong><br>
                         Course ID: @Model.Course?.CourseId<br>
@@ -122,9 +140,9 @@
 
             @if (Model.Quizzes.Any())
             {
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h5><i class="fas fa-question-circle"></i> Course Quizzes</h5>
+                <div class="card mt-3" id="course-quizzes">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Course Quizzes</h5>
                     </div>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
@@ -155,7 +173,7 @@
                                         }
                                         else
                                         {
-                                            <a href="/Learning/Quiz/@quiz.QuizId" class="btn btn-primary btn-sm">
+                                            <a href="/Quiz/@quiz.QuizId" class="btn btn-primary btn-sm">
                                                 Take Quiz
                                             </a>
                                         }

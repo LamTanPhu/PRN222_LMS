@@ -6,6 +6,21 @@
 
 <div class="container mt-5">
     <h1>My Learning Progress</h1>
+    
+    <!-- Quiz Access Section -->
+    <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+        <div class="d-flex align-items-center">
+            <div class="flex-grow-1">
+                <h5 class="mb-1"><i class="fas fa-question-circle me-2"></i>Want to Take Quizzes?</h5>
+                <p class="mb-0">Quizzes are now available through individual lessons. Click "Continue Learning" on any course to access lesson quizzes.</p>
+            </div>
+            <div class="ms-3">
+                <a href="/Learning" class="btn btn-light">
+                    <i class="fas fa-graduation-cap me-2"></i>Go to Learning
+                </a>
+            </div>
+        </div>
+    </div>
 
     @if (Model.CourseProgressList.Any())
     {
@@ -51,10 +66,12 @@
                                 <a asp-page="/Courses/Lessons" asp-route-id="@item.CourseId" class="btn btn-primary">
                                     Continue Learning
                                     </a>
-
+                                
+                                @* 
                                 <a asp-page="/Quiz/Index" asp-route-courseId="@item.CourseId" class="btn btn-info">
                                     Take Quiz
                                 </a>
+                                *@
                         @if (item.ProgressPercentage >= 100)
                         {
                                         <a asp-page="/Certificate/Index" asp-route-courseId="@item.CourseId" class="btn btn-success">

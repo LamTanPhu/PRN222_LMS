@@ -104,6 +104,24 @@
 
                     <hr />
 
+                    <!-- Quiz Section - Make it prominent! -->
+                    @if (Model.Quizzes.Any())
+                    {
+                        <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-1"><i class="fas fa-question-circle me-2"></i>Lesson Quiz Available!</h5>
+                                    <p class="mb-0">Test your knowledge with the lesson quiz. You can take it now or continue to the next lesson.</p>
+                                </div>
+                                <div class="ms-3">
+                                    <a href="/Quiz/@Model.Quizzes.First().QuizId" class="btn btn-light btn-lg">
+                                        <i class="fas fa-play me-2"></i>Take Quiz Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             @if (Model.PreviousLesson != null)
@@ -133,7 +151,7 @@
                             }
                             else if (Model.Quizzes.Any())
                             {
-                                <a href="/Learning/Quiz/@Model.Quizzes.First().QuizId" class="btn btn-primary">
+                                <a href="/Quiz/@Model.Quizzes.First().QuizId" class="btn btn-primary">
                                     Take Quiz <i class="fas fa-question-circle"></i>
                                 </a>
                             }
@@ -169,24 +187,6 @@
                     <h5><i class="fas fa-question-circle"></i> Lesson Quizzes</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Debug Information -->
-                    <div class="alert alert-info mb-3">
-                        <strong>Debug Info:</strong><br>
-                        Lesson ID: @Model.Lesson.LessonId<br>
-                        Quizzes Found: @Model.Quizzes.Count<br>
-                        @if (Model.Quizzes.Any())
-                        {
-                            <div class="mt-2">
-                                <strong>Quiz Details:</strong><br>
-                                @foreach (var quiz in Model.Quizzes)
-                                {
-                                    <span class="badge bg-@(quiz.QuizQuestions?.Count > 0 ? "success" : "warning") me-2 mb-1">
-                                        @quiz.Title (Questions: @(quiz.QuizQuestions?.Count ?? 0))
-                                    </span>
-                                }
-                            </div>
-                        }
-                    </div>
 
                     @if (Model.Quizzes.Any())
                     {
@@ -215,7 +215,7 @@
                                     <div>
                                         @if (quiz.QuizQuestions?.Count > 0)
                                         {
-                                            <a href="/Learning/Quiz/@quiz.QuizId" class="btn btn-sm @(quizAttempt?.IsPassed == true ? "btn-outline-success" : "btn-primary")">
+                                            <a href="/Quiz/@quiz.QuizId" class="btn btn-sm @(quizAttempt?.IsPassed == true ? "btn-outline-success" : "btn-primary")">
                                                 @(quizAttempt?.IsPassed == true ? "Retake" : "Take Quiz")
                                             </a>
                                         }

@@ -16,6 +16,24 @@
                     <i class="fas fa-arrow-left me-1"></i>Back to Course
                 </a>
             </div>
+            
+            @* <!-- Quiz Overview Section -->
+            @if (Model.CourseQuizzes.Any())
+            {
+                <div class="alert alert-info border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="mb-1"><i class="fas fa-question-circle me-2"></i>Course Quizzes Available!</h5>
+                            <p class="mb-0">This course has @Model.CourseQuizzes.Count quiz(zes) to test your knowledge. Look for the quiz section in each lesson card below.</p>
+                        </div>
+                        <div class="ms-3">
+                            <span class="badge bg-light text-dark fs-6">
+                                <i class="fas fa-question-circle me-1"></i>@Model.CourseQuizzes.Count Quiz@(Model.CourseQuizzes.Count > 1 ? "es" : "")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            } *@
 
             @if (!Model.Lessons.Any())
             {
@@ -63,30 +81,69 @@
                                             <i class="fas fa-file-alt me-1"></i>
                                             @lesson.LessonType
                                         </span>
-                                        
-                                        @if (lesson.IsCompleted == true)
+                                        @if (lesson.Course.Enrollments.Where(e => int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value) == e.UserId && lesson.Course.CourseId == e.CourseId).FirstOrDefault() != null)
                                         {
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check me-1"></i>Completed
-                                            </span>
-                                            <button class="btn btn-outline-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
-                                                <i class="fas fa-play me-1"></i>Learn Again
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
-                                                <i class="fas fa-play me-1"></i>Start Lesson
-                                            </button>
-                                            <form method="post" asp-page-handler="MarkCompleted">
-                                                <input type="hidden" name="courseId" value="@Model.CourseId" />
-                                                <input type="hidden" name="lessonId" value="@lesson.LessonId" />
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-check me-1"></i>Mark Completed
+                                            @if (lesson.IsCompleted == true)
+                                            {
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Completed
+                                                </span>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
+                                                    <i class="fas fa-play me-1"></i>Learn Again
                                                 </button>
-                                            </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-primary btn-sm" onclick="startLesson(@lesson.LessonId)">
+                                                    <i class="fas fa-play me-1"></i>Start Lesson
+                                                </button>
+                                                <form method="post" asp-page-handler="MarkCompleted">
+                                                    <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                                    <input type="hidden" name="lessonId" value="@lesson.LessonId" />
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-check me-1"></i>Mark Completed
+                                                    </button>
+                                                </form>
+                                            }
                                         }
                                     </div>
+                                    
+                                    <!-- Quiz Section -->
+                                    @{
+                                        var lessonQuiz = Model.CourseQuizzes.FirstOrDefault(q => q.LessonId == lesson.LessonId);
+                                        var quizAttempt = lessonQuiz != null ? Model.QuizAttempts.FirstOrDefault(a => a.QuizId == lessonQuiz.QuizId) : null;
+                                    }
+                                    @if (lessonQuiz != null)
+                                    {
+                                        <hr class="my-3" />
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-question-circle me-1"></i>Quiz Available
+                                                </span>
+                                                @if (quizAttempt != null)
+                                                {
+                                                    <small class="d-block text-muted mt-1">
+                                                        Score: <span class="text-@(quizAttempt.IsPassed == true ? "success" : "danger")">@(quizAttempt.Score?.ToString("F1") ?? "0")%</span>
+                                                    </small>
+                                                }
+                                            </div>
+                                            <div>
+                                                @if (quizAttempt?.IsPassed == true)
+                                                {
+                                                    <a href="/Quiz/@lessonQuiz.QuizId" class="btn btn-outline-success btn-sm">
+                                                        <i class="fas fa-redo me-1"></i>Retake Quiz
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/Quiz/@lessonQuiz.QuizId" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-play me-1"></i>Take Quiz
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -121,7 +178,7 @@
 
 <script>
 function startLesson(lessonId) {
-    // TODO: Implement lesson viewing functionality
-    alert('Starting lesson ' + lessonId + '. This would open the lesson content.');
+    // Navigate to the lesson page
+    window.location.href = '/Learning/Lesson/' + lessonId;
 }
 </script>

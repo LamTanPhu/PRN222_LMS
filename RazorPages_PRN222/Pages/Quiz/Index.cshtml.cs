@@ -31,15 +31,12 @@ namespace RazorPages_PRN222.Pages.Quiz
         [BindProperty]
         public int QuizId { get; set; }
         
-        [BindProperty]
-        public int CourseId { get; set; }
-        
         // Display properties
-        public string CourseTitle { get; set; } = string.Empty;
         public Repository.Models.Quiz? Quiz { get; set; }
         public List<Repository.Models.QuizQuestion> Questions { get; set; } = new();
+        public int LessonId { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int courseId)
+        public async Task<IActionResult> OnGetAsync(int quizId)
         {
             // Check authentication
             if (!User.Identity?.IsAuthenticated ?? true)
@@ -47,8 +44,8 @@ namespace RazorPages_PRN222.Pages.Quiz
                 return RedirectToPage("/Login");
             }
 
-            // Set course ID
-            CourseId = courseId;
+            // Set quiz ID
+            QuizId = quizId;
 
             // Get user ID from claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
@@ -59,72 +56,34 @@ namespace RazorPages_PRN222.Pages.Quiz
 
             try
             {
-                // Get course information
-                var course = await _courseService.GetByIdAsync(courseId);
-                if (course == null)
+                // Get quiz information
+                Quiz = await _quizService.GetByIdAsync(quizId);
+                if (Quiz == null)
                 {
                     return NotFound();
                 }
-                CourseTitle = course.Title;
 
-                // Debug: Log course information
-                System.Diagnostics.Debug.WriteLine($"=== QUIZ PAGE DEBUG ===");
-                System.Diagnostics.Debug.WriteLine($"Course ID: {courseId}, Title: {course.Title}");
-
-                // Get all lessons for this course
-                var allLessons = await _lessonService.GetAllAsync();
-                var courseLessons = allLessons.Where(l => l.CourseId == courseId).OrderBy(l => l.SortOrder).ToList();
+                // Set lesson ID for navigation
+                LessonId = Quiz.LessonId;
+                    
+                // Load questions for this quiz
+                Questions = await _quizQuestionService.GetByQuizIdAsync(Quiz.QuizId);
                 
-                System.Diagnostics.Debug.WriteLine($"Lessons found: {courseLessons.Count}");
-                foreach (var lesson in courseLessons)
+                if (Questions != null && Questions.Any())
                 {
-                    System.Diagnostics.Debug.WriteLine($"  Lesson {lesson.LessonId}: {lesson.Title}");
-                }
-
-                // Get all quizzes and find ones that belong to lessons in this course
-                var allQuizzes = await _quizService.GetAllAsync();
-                var lessonIds = courseLessons.Select(l => l.LessonId).ToList();
-                var courseQuizzes = allQuizzes.Where(q => lessonIds.Contains(q.LessonId)).ToList();
-                
-                System.Diagnostics.Debug.WriteLine($"Quizzes found: {courseQuizzes.Count}");
-                foreach (var quiz in courseQuizzes)
-                {
-                    System.Diagnostics.Debug.WriteLine($"  Quiz {quiz.QuizId}: {quiz.Title} (LessonId: {quiz.LessonId})");
-                }
-
-                // Select the first available quiz (or you could show a list to choose from)
-                if (courseQuizzes.Any())
-                {
-                    Quiz = courseQuizzes.First();
-                    QuizId = Quiz.QuizId;
+                    System.Diagnostics.Debug.WriteLine($"✓ Successfully loaded {Questions.Count} questions for quiz {Quiz.QuizId}");
                     
-                    System.Diagnostics.Debug.WriteLine($"Selected Quiz: {Quiz.QuizId} - {Quiz.Title}");
-                    
-                    // Load questions for this quiz
-                    Questions = await _quizQuestionService.GetByQuizIdAsync(Quiz.QuizId);
-                    
-                    if (Questions != null && Questions.Any())
+                    // Load answers for each question if needed
+                    foreach (var question in Questions)
                     {
-                        System.Diagnostics.Debug.WriteLine($"✓ Successfully loaded {Questions.Count} questions for quiz {Quiz.QuizId}");
-                        
-                        // Load answers for each question if needed
-                        foreach (var question in Questions)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"  Question {question.QuestionId}: {question.QuestionText.Substring(0, Math.Min(50, question.QuestionText.Length))}...");
-                            System.Diagnostics.Debug.WriteLine($"    Type: {question.QuestionType}, Points: {question.Points}");
-                            System.Diagnostics.Debug.WriteLine($"    Answers: {question.QuizAnswers?.Count ?? 0}");
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"✗ No questions found for quiz {Quiz.QuizId}");
-                        Questions = new List<Repository.Models.QuizQuestion>();
+                        System.Diagnostics.Debug.WriteLine($"  Question {question.QuestionId}: {question.QuestionText.Substring(0, Math.Min(50, question.QuestionText.Length))}...");
+                        System.Diagnostics.Debug.WriteLine($"    Type: {question.QuestionType}, Points: {question.Points}");
+                        System.Diagnostics.Debug.WriteLine($"    Answers: {question.QuizAnswers?.Count ?? 0}");
                     }
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("✗ No quizzes found for this course");
-                    Quiz = null;
+                    System.Diagnostics.Debug.WriteLine($"✗ No questions found for quiz {Quiz.QuizId}");
                     Questions = new List<Repository.Models.QuizQuestion>();
                 }
 

@@ -1,211 +1,170 @@
-using Microsoft.AspNetCore.Authorization;
+/*
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Repository.Models;
 using Service.Interface;
-using System.Security.Claims;
+using Repository.Models;
 
 namespace RazorPages_PRN222.Pages.Learning
 {
-    [Authorize]
     public class QuizModel : PageModel
     {
         private readonly IQuizService _quizService;
+        private readonly IStudentQuizAttemptService _attemptService;
+        private readonly ICourseService _courseService;
         private readonly IQuizQuestionService _quizQuestionService;
         private readonly ILessonService _lessonService;
-        private readonly ICourseService _courseService;
-        private readonly IStudentQuizAttemptService _studentQuizAttemptService;
-        private readonly IEnrollmentService _enrollmentService;
 
         public QuizModel(
-            IQuizService quizService,
+            IQuizService quizService, 
+            IStudentQuizAttemptService attemptService, 
+            ICourseService courseService, 
             IQuizQuestionService quizQuestionService,
-            ILessonService lessonService,
-            ICourseService courseService,
-            IStudentQuizAttemptService studentQuizAttemptService,
-            IEnrollmentService enrollmentService)
+            ILessonService lessonService)
         {
             _quizService = quizService;
+            _attemptService = attemptService;
+            _courseService = courseService;
             _quizQuestionService = quizQuestionService;
             _lessonService = lessonService;
-            _courseService = courseService;
-            _studentQuizAttemptService = studentQuizAttemptService;
-            _enrollmentService = enrollmentService;
         }
 
-        public Repository.Models.Quiz Quiz { get; set; }
-        public Lesson Lesson { get; set; }
-        public Course Course { get; set; }
-        public List<QuizQuestion> Questions { get; set; } = new List<QuizQuestion>();
-        public StudentQuizAttempt PreviousAttempt { get; set; }
+        [BindProperty]
+        public int QuizId { get; set; }
+        
+        public Repository.Models.Quiz? Quiz { get; set; }
+        public List<Repository.Models.QuizQuestion> Questions { get; set; } = new();
+        public Repository.Models.Lesson? Lesson { get; set; }
+        public Repository.Models.Course? Course { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int quizId)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            if (!User.Identity?.IsAuthenticated ?? true)
             {
                 return RedirectToPage("/Login");
             }
-            
-            try
-            {
-                // Get quiz with all related data
-                Quiz = await _quizService.GetByIdAsync(id);
-                if (Quiz == null)
-                {
-                    TempData["Error"] = $"Quiz with ID {id} not found.";
-                    return RedirectToPage("/Learning/Index");
-                }
 
-                // Get lesson
-                Lesson = await _lessonService.GetByIdAsync(Quiz.LessonId);
-                if (Lesson == null)
-                {
-                    TempData["Error"] = "Lesson not found for this quiz.";
-                    return RedirectToPage("/Learning/Index");
-                }
+            QuizId = quizId;
 
-                // Get course
-                Course = await _courseService.GetByIdAsync(Lesson.CourseId);
-                if (Course == null)
-                {
-                    TempData["Error"] = "Course not found for this lesson.";
-                    return RedirectToPage("/Learning/Index");
-                }
-
-                // Check if user is enrolled
-                var allEnrollments = await _enrollmentService.GetAllAsync();
-                var enrollment = allEnrollments.FirstOrDefault(e => e.UserId == userId && e.CourseId == Lesson.CourseId);
-                if (enrollment == null)
-                {
-                    return RedirectToPage("/Courses/Enroll", new { id = Lesson.CourseId });
-                }
-
-                // Load quiz questions
-                await LoadQuizData(userId, id);
-                
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred while loading the quiz. Please try again.";
-                return RedirectToPage("/Learning/Index");
-            }
-        }
-
-        public async Task<IActionResult> OnPostAsync(int quizId, Dictionary<int, string> answers)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
             {
                 return RedirectToPage("/Login");
             }
-            
+
             try
             {
-                // Get quiz and questions
                 Quiz = await _quizService.GetByIdAsync(quizId);
                 if (Quiz == null)
                 {
                     return NotFound();
                 }
 
-                var allQuestions = await _quizQuestionService.GetByQuizIdAsync(quizId);
-                Questions = allQuestions.ToList();
-
-                // Calculate score
-                int correctAnswers = 0;
-                int totalQuestions = Questions.Count;
-
-                foreach (var question in Questions)
+                Lesson = await _lessonService.GetByIdAsync(Quiz.LessonId);
+                if (Lesson != null)
                 {
-                    if (answers.ContainsKey(question.QuestionId))
+                    Course = await _courseService.GetByIdAsync(Lesson.CourseId);
+                }
+
+                Questions = await _quizQuestionService.GetByQuizIdAsync(Quiz.QuizId);
+                
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToPage("/Error");
+            }
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return RedirectToPage("/Login");
+            }
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return RedirectToPage("/Login");
+            }
+
+            try
+            {
+                Questions = await _quizQuestionService.GetByQuizIdAsync(QuizId);
+                
+                if (Questions == null || !Questions.Any())
+                {
+                    return RedirectToPage("/Error");
+                }
+
+                var answers = new List<string>();
+                
+                for (int i = 0; i < Questions.Count; i++)
+                {
+                    var answerKey = $"Answers[{i}]";
+                    var answerValue = Request.Form[answerKey].FirstOrDefault();
+                    if (!string.IsNullOrEmpty(answerValue))
                     {
-                        var studentAnswer = answers[question.QuestionId];
-                        var correctAnswer = question.QuizAnswers.FirstOrDefault(a => a.IsCorrect == true);
-                        
-                        if (correctAnswer != null)
-                        {
-                            if (question.QuestionType == "Multiple Choice")
-                            {
-                                if (int.TryParse(studentAnswer, out int answerId) && answerId == correctAnswer.AnswerId)
-                                {
-                                    correctAnswers++;
-                                }
-                            }
-                            else if (question.QuestionType == "True/False")
-                            {
-                                bool studentBool = bool.Parse(studentAnswer);
-                                bool correctBool = bool.Parse(correctAnswer.AnswerText);
-                                if (studentBool == correctBool)
-                                {
-                                    correctAnswers++;
-                                }
-                            }
-                            // For Short Answer, we'll just count as correct for now
-                            else if (question.QuestionType == "Short Answer")
-                            {
-                                if (!string.IsNullOrWhiteSpace(studentAnswer))
-                                {
-                                    correctAnswers++;
-                                }
-                            }
-                        }
+                        answers.Add(answerValue);
                     }
                 }
 
-                decimal score = totalQuestions > 0 ? (decimal)correctAnswers / totalQuestions * 100 : 0;
-                bool isPassed = score >= (Quiz.PassingScore ?? 70);
+                var score = CalculateScore(answers);
+                var isPassed = score >= 50;
 
-                // Get previous attempt number
-                var allAttempts = await _studentQuizAttemptService.GetAllAsync();
-                var previousAttempts = allAttempts.Where(a => a.UserId == userId && a.QuizId == quizId).ToList();
-                int attemptNumber = previousAttempts.Count + 1;
-
-                // Create quiz attempt
-                var quizAttempt = new StudentQuizAttempt
+                var attempt = new Repository.Models.StudentQuizAttempt
                 {
                     UserId = userId,
-                    QuizId = quizId,
-                    AttemptNumber = attemptNumber,
-                    Score = score,
-                    StartedAt = DateTime.Now.AddMinutes(-30), // Assuming 30 minutes for the quiz
+                    QuizId = QuizId,
+                    AttemptNumber = 1,
+                    StartedAt = DateTime.Now,
                     CompletedAt = DateTime.Now,
-                    TimeSpent = 30, // Assuming 30 minutes
+                    Score = score,
                     IsPassed = isPassed
                 };
 
-                var result = await _studentQuizAttemptService.CreateAsync(quizAttempt);
+                await _attemptService.CreateAsync(attempt);
 
-                // Redirect to results page
-                return RedirectToPage("/Learning/QuizResult", new { attemptId = quizAttempt.AttemptId });
+                return RedirectToPage("/Learning/QuizResult", new { attemptId = attempt.AttemptId });
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred while submitting the quiz. Please try again.";
-                return RedirectToPage(new { id = quizId });
+                return RedirectToPage("/Error");
             }
         }
 
-        private async Task LoadQuizData(int userId, int quizId)
+        private decimal CalculateScore(List<string> answers)
         {
-            try
+            if (Questions == null || !Questions.Any() || !answers.Any())
             {
-                // Load questions using QuizQuestionService
-                var questions = await _quizQuestionService.GetByQuizIdAsync(quizId);
-                Questions = questions ?? new List<QuizQuestion>();
+                return 0;
+            }
 
-                // Get previous attempt
-                var allAttempts = await _studentQuizAttemptService.GetAllAsync();
-                PreviousAttempt = allAttempts
-                    .Where(a => a.UserId == userId && a.QuizId == quizId)
-                    .OrderByDescending(a => a.AttemptNumber)
-                    .FirstOrDefault();
-            }
-            catch (Exception ex)
+            int correctAnswers = 0;
+            int totalQuestions = Questions.Count;
+
+            for (int i = 0; i < answers.Count && i < totalQuestions; i++)
             {
-                TempData["Error"] = "Error loading quiz data. Please try again.";
+                if (int.TryParse(answers[i], out int selectedAnswerId))
+                {
+                    var question = Questions[i];
+                    var correctAnswer = question.QuizAnswers?.FirstOrDefault(a => a.IsCorrect == true);
+                    
+                    if (correctAnswer != null && correctAnswer.AnswerId == selectedAnswerId)
+                    {
+                        correctAnswers++;
+                    }
+                }
             }
+
+            return totalQuestions > 0 ? (decimal)correctAnswers / totalQuestions * 100 : 0;
         }
     }
 }
+*/
+
+/*
+OLD LEARNING QUIZ PAGE MODEL - NO LONGER USED
+This page model has been replaced by /Quiz/Index.cshtml.cs for lesson-based quizzes.
+The content above is preserved for reference but commented out.
+*/

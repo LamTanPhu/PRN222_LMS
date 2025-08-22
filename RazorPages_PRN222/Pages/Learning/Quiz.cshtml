@@ -1,7 +1,8 @@
-@page
+@* 
+@page "{quizId:int}"
 @model RazorPages_PRN222.Pages.Learning.QuizModel
 @{
-    ViewData["Title"] = "Quiz - " + Model.Quiz?.Title;
+    ViewData["Title"] = "Quiz";
     Layout = "_Layout";
 }
 
@@ -13,7 +14,7 @@
                     <li class="breadcrumb-item"><a href="/Learning">My Learning</a></li>
                     <li class="breadcrumb-item"><a href="/Learning/Course/@Model.Course?.CourseId">@Model.Course?.Title</a></li>
                     <li class="breadcrumb-item"><a href="/Learning/Lesson/@Model.Lesson?.LessonId">@Model.Lesson?.Title</a></li>
-                    <li class="breadcrumb-item active">@Model.Quiz?.Title</li>
+                    <li class="breadcrumb-item active">Quiz</li>
                 </ol>
             </nav>
         </div>
@@ -21,136 +22,64 @@
 
     <div class="row">
         <div class="col-md-8">
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> @TempData["Error"]
-                </div>
-            }
-            @if (TempData["Warning"] != null)
-            {
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> @TempData["Warning"]
-                </div>
-            }
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> @TempData["Success"]
-                </div>
-            }
-
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3><i class="fas fa-question-circle"></i> @Model.Quiz?.Title</h3>
-                        <div>
-                            @if (Model.PreviousAttempt != null)
-                            {
-                                <span class="badge @(Model.PreviousAttempt.IsPassed == true ? "bg-success" : "bg-danger") me-2">
-                                    Previous Score: @(Model.PreviousAttempt.Score?.ToString("F1") ?? "0")%
-                                </span>
-                            }
-                            <span class="badge bg-info">@Model.Questions.Count Questions</span>
-                        </div>
-                    </div>
+                    <h3><i class="fas fa-question-circle"></i> @Model.Quiz?.Title</h3>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">@Model.Quiz?.Description</p>
-                    
-                    @if (Model.PreviousAttempt?.IsPassed == true)
+                    @if (Model.Questions.Any())
                     {
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i> You have already passed this quiz! You can retake it if you want.
-                        </div>
-                    }
-
-                    @if (Model.Questions.Count == 0)
-                    {
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i> <strong>No questions available for this quiz!</strong><br>
-                            <small class="text-muted">Please contact your instructor to add questions to this quiz.</small>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Lesson
-                            </a>
-                            <a href="/Learning/Course/@Model.Course?.CourseId" class="btn btn-primary">
-                                <i class="fas fa-arrow-left"></i> Back to Course
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <form method="post" id="quizForm">
-                            <input type="hidden" name="quizId" value="@Model.Quiz?.QuizId" />
+                        <form method="post">
+                            <input type="hidden" name="QuizId" value="@Model.Quiz?.QuizId" />
                             
                             @for (int i = 0; i < Model.Questions.Count; i++)
                             {
                                 var question = Model.Questions[i];
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h5>Question @(i + 1): @question.QuestionText</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        @if (question.QuestionType == "Multiple Choice")
+                                <div class="question-card mb-4 p-4 border rounded">
+                                    <h5 class="mb-3">
+                                        <span class="badge bg-primary me-2">@(i + 1)</span>
+                                        @question.QuestionText
+                                    </h5>
+                                    
+                                    <div class="answers-container">
+                                        @foreach (var answer in question.QuizAnswers)
                                         {
-                                            @foreach (var answer in question.QuizAnswers)
-                                            {
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" 
-                                                           name="answers[@question.QuestionId]" 
-                                                           value="@answer.AnswerId" 
-                                                           id="answer@(answer.AnswerId)" required>
-                                                    <label class="form-check-label" for="answer@(answer.AnswerId)">
-                                                        @answer.AnswerText
-                                                    </label>
-                                                </div>
-                                            }
-                                        }
-                                        else if (question.QuestionType == "True/False")
-                                        {
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" 
-                                                       name="answers[@question.QuestionId]" 
-                                                       value="true" id="true@(question.QuestionId)" required>
-                                                <label class="form-check-label" for="true@(question.QuestionId)">
-                                                    True
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" 
+                                                       type="radio" 
+                                                       name="Answers[@i]" 
+                                                       value="@answer.AnswerId" 
+                                                       id="answer_@(i)_@(answer.AnswerId)" />
+                                                <label class="form-check-label" for="answer_@(i)_@(answer.AnswerId)">
+                                                    @answer.AnswerText
                                                 </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" 
-                                                       name="answers[@question.QuestionId]" 
-                                                       value="false" id="false@(question.QuestionId)" required>
-                                                <label class="form-check-label" for="false@(question.QuestionId)">
-                                                    False
-                                                </label>
-                                            </div>
-                                        }
-                                        else if (question.QuestionType == "Short Answer")
-                                        {
-                                            <div class="form-group">
-                                                <textarea class="form-control" 
-                                                          name="answers[@question.QuestionId]" 
-                                                          rows="3" 
-                                                          placeholder="Type your answer here..." 
-                                                          required></textarea>
                                             </div>
                                         }
                                     </div>
                                 </div>
                             }
-
-                            <div class="d-flex justify-content-between">
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-4">
                                 <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left"></i> Back to Lesson
+                                    <i class="bi bi-arrow-left"></i> Back to Lesson
                                 </a>
-                                <button type="submit" class="btn btn-primary" id="submitQuiz">
-                                    <i class="fas fa-paper-plane"></i> Submit Quiz
+                                
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle"></i> Submit Quiz
                                 </button>
                             </div>
                         </form>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                                <h4>No Questions Available</h4>
+                                <p class="mb-3">This quiz doesn't have any questions yet.</p>
+                                <a href="/Learning/Lesson/@Model.Lesson?.LessonId" class="btn btn-primary">Back to Lesson</a>
+                            </div>
+                        </div>
                     }
                 </div>
             </div>
@@ -166,36 +95,19 @@
                         <li><strong>Questions:</strong> @Model.Questions.Count</li>
                         <li><strong>Time Limit:</strong> @(Model.Quiz?.TimeLimit ?? 0) minutes</li>
                         <li><strong>Passing Score:</strong> @(Model.Quiz?.PassingScore ?? 70)%</li>
-                        <li><strong>Attempts:</strong> @(Model.PreviousAttempt?.AttemptNumber ?? 0)</li>
+                        <li><strong>Max Attempts:</strong> @(Model.Quiz?.MaxAttempts ?? 1)</li>
                     </ul>
                 </div>
             </div>
 
-            @if (Model.Quiz?.TimeLimit > 0)
-            {
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h5><i class="fas fa-clock"></i> Timer</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        <div id="timer" class="h3 text-primary">--:--</div>
-                        <small class="text-muted">Time remaining</small>
-                    </div>
-                </div>
-            }
-
             <div class="card mt-3">
                 <div class="card-header">
-                    <h5><i class="fas fa-list"></i> Question Navigation</h5>
+                    <h5><i class="fas fa-clock"></i> Timer</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex flex-wrap gap-1" id="questionNav">
-                        @for (int i = 0; i < Model.Questions.Count; i++)
-                        {
-                            <button type="button" class="btn btn-outline-primary btn-sm question-nav" data-question="@(i + 1)">
-                                @(i + 1)
-                            </button>
-                        }
+                    <div class="text-center">
+                        <h4 class="text-primary" id="timer">@(Model.Quiz?.TimeLimit ?? 0):00</h4>
+                        <small class="text-muted">Time remaining</small>
                     </div>
                 </div>
             </div>
@@ -203,67 +115,43 @@
     </div>
 </div>
 
-<script>
-    // Timer functionality
-    let timeLeft = @(Model.Quiz?.TimeLimit ?? 0) * 60; // Convert to seconds
-    const timerElement = document.getElementById('timer');
-    const submitButton = document.getElementById('submitQuiz');
-    const quizForm = document.getElementById('quizForm');
+<style>
+.question-card {
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
 
-    function updateTimer() {
-        if (timeLeft <= 0) {
-            timerElement.textContent = '00:00';
-            timerElement.className = 'h3 text-danger';
-            alert('Time is up! Submitting quiz automatically.');
-            quizForm.submit();
-            return;
-        }
+.question-card:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 60) { // Last minute
-            timerElement.className = 'h3 text-danger';
-        }
-        
-        timeLeft--;
-    }
+.answers-container {
+    padding-left: 1rem;
+}
 
-    if (timeLeft > 0) {
-        updateTimer();
-        setInterval(updateTimer, 1000);
-    }
+.form-check-input:checked + .form-check-label {
+    font-weight: 600;
+    color: #0d6efd;
+}
 
-    // Question navigation
-    document.querySelectorAll('.question-nav').forEach(button => {
-        button.addEventListener('click', function() {
-            const questionNumber = this.getAttribute('data-question');
-            const questionElement = document.querySelectorAll('.card')[questionNumber]; // +1 for header card
-            questionElement.scrollIntoView({ behavior: 'smooth' });
-        });
-    });
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
+</style>
 
-    // Form validation
-    quizForm.addEventListener('submit', function(e) {
-        const questions = @Model.Questions.Count;
-        let answered = 0;
-        
-        for (let i = 0; i < questions; i++) {
-            const questionId = @(Model.Questions.Any() ? Model.Questions.First().QuestionId : 0) + i;
-            const answers = document.querySelectorAll(`input[name="answers[${questionId}]"]:checked`);
-            if (answers.length > 0) {
-                answered++;
-            }
-        }
-        
-        if (answered < questions) {
-            e.preventDefault();
-            alert(`Please answer all ${questions} questions before submitting.`);
-            return false;
-        }
-        
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-    });
-</script>
+@section Scripts {
+    <script>
+        // Timer functionality would go here
+        // This is commented out as this page is no longer used
+    </script>
+}
+*@
+
+@* 
+OLD LEARNING QUIZ PAGE - NO LONGER USED
+This page has been replaced by /Quiz/Index.cshtml for lesson-based quizzes.
+The content above is preserved for reference but commented out.
+*@

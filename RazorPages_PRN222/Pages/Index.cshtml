@@ -4,6 +4,56 @@
     ViewData["Title"] = "Welcome to E-Learning";
 }
 
+<style>
+    /* Announcements section: more spacing, card look */
+    .announcement-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .announcement-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        padding: 1.25rem 1.5rem;
+        flex: 1 1 320px;
+        min-width: 320px;
+        max-width: 100%;
+        margin-bottom: 0;
+    }
+    .announcement-card h5 {
+        margin-bottom: 0.5rem;
+    }
+    .announcement-card p {
+        margin-bottom: 0.5rem;
+    }
+    .announcement-card small {
+        color: #888;
+    }
+
+    /* Explore Categories: center, wrap, spacing */
+    .categories-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    .categories-list a {
+        min-width: 140px;
+        text-align: center;
+        padding: 0.75rem 1.25rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        transition: box-shadow 0.2s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .categories-list a:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    }
+</style>
+
 <div class="container mt-5">
     <h1>Welcome to the E-Learning Platform</h1>
 
@@ -28,101 +78,26 @@
 
     <!-- Recent Announcements -->
     <h2>Recent Announcements</h2>
-    <ul class="list-group mb-4">
+    <div class="announcement-list">
         @foreach (var announcement in Model.Announcements)
         {
-            <li class="list-group-item">
+            <div class="announcement-card">
                 <h5>@announcement.Title</h5>
                 <p>@announcement.Content</p>
                 <small>Posted by @(announcement.Author?.FullName ?? "N/A") on @announcement.PublishDate?.ToString("d")</small>
-            </li>
-        }
-    </ul>
-
-    <!-- Top Categories -->
-    <h2>Explore Categories</h2>
-    <div class="row">
-        @foreach (var category in Model.Categories)
-        {
-            <div class="col-md-3">
-                <a asp-page="/Courses/Index" asp-route-categoryId="@category.CategoryId" class="btn btn-outline-primary">@category.Name</a>
             </div>
         }
     </div>
 
-    <!-- Learning Features -->
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <h2 class="mt-5">Learning Dashboard</h2>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-heart fa-2x text-danger mb-2"></i>
-                        <h5 class="card-title">My Wishlist</h5>
-                        <p class="card-text">Manage your favorite courses</p>
-                        <a asp-page="/Wishlist/Index" class="btn btn-outline-danger">View Wishlist</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-chart-line fa-2x text-primary mb-2"></i>
-                        <h5 class="card-title">My Progress</h5>
-                        <p class="card-text">Track your learning progress</p>
-                        <a asp-page="/Progress/Index" class="btn btn-outline-primary">View Progress</a>
-                    </div>
-                </div>
-            </div>
+    <!-- Top Categories -->
+    <h2>Explore Categories</h2>
+    <div class="categories-list">
+        @foreach (var category in Model.Categories)
+        {
+            <a asp-page="/Courses/Index" asp-route-categoryId="@category.CategoryId" class="btn btn-outline-primary">@category.Name</a>
+        }
+    </div>
 
-            @* 
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-question-circle fa-2x text-warning mb-2"></i>
-                        <h5 class="card-title">Take Quiz</h5>
-                        <p class="card-text">Test your knowledge</p>
-                        <a asp-page="/Quiz/Index" class="btn btn-outline-warning">Start Quiz</a>
-                    </div>
-                </div>
-            </div>
-            *@
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-certificate fa-2x text-success mb-2"></i>
-                        <h5 class="card-title">Certificates</h5>
-                        <p class="card-text">View your achievements</p>
-                        <a asp-page="/Certificate/Index" class="btn btn-outline-success">View Certificates</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-comments fa-2x text-info mb-2"></i>
-                        <h5 class="card-title">Course Forums</h5>
-                        <p class="card-text">Discuss with other learners</p>
-                        <a asp-page="/Forum/Index" class="btn btn-outline-info">Join Discussion</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <i class="fas fa-star fa-2x text-warning mb-2"></i>
-                        <h5 class="card-title">Course Reviews</h5>
-                        <p class="card-text">Share your experience</p>
-                        <a asp-page="/Review/Index" class="btn btn-outline-warning">Write Review</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
     @if (User.Claims.FirstOrDefault(c => c.Type == "Role") != null)
     {
         if (User.Claims.First(c => c.Type == "Role").Value.Equals("Admin"))

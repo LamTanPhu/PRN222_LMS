@@ -25,6 +25,8 @@ namespace Repository.Repositories
             return await _context.Lessons
                 .Include(l => l.Course)
                     .ThenInclude(c => c.Instructor)
+                .Include(l => l.Course)
+                    .ThenInclude(c => c.Enrollments)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -34,6 +36,8 @@ namespace Repository.Repositories
             return await _context.Lessons
                 .Include(l => l.Course)
                     .ThenInclude(c => c.Instructor)
+                .Include(l => l.Course)
+                    .ThenInclude(c => c.Enrollments)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(l => l.LessonId == id);
         }

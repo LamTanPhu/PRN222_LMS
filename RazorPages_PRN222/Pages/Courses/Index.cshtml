@@ -40,7 +40,7 @@
                             <div class="btn-group" role="group">
                                 @if (course.Enrollments.Where(e => int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value) == e.UserId && course.CourseId == e.CourseId).FirstOrDefault() != null)
                                 {
-                                    <a asp-page="/Courses/Details" asp-route-id="@course.CourseId" class="btn btn-primary">
+                                    <a asp-page="/Courses/Lessons" asp-route-id="@course.CourseId" class="btn btn-primary">
                                         <i class="fas fa-graduation-cap"></i> Study
                                     </a>
                                 }

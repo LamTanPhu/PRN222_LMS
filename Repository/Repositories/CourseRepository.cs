@@ -35,6 +35,7 @@ namespace Repository.Repositories
             return await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.Instructor)
+                .Include(c => c.Enrollments)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.CourseId == id);
         }

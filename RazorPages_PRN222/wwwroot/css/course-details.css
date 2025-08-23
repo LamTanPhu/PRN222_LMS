@@ -1,0 +1,91 @@
+/* ===== COURSE DETAILS BUTTON ALIGNMENT ===== */
+
+/* Container cho các button */
+.course-navigation {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Flex container cho các button */
+.course-navigation .d-flex {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+}
+
+/* Style cho từng button container */
+.course-navigation .col-md-2 {
+    flex: 0 0 auto !important;
+    min-width: 200px !important;
+    max-width: 250px !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Style cho các button */
+.course-navigation .btn {
+    width: 100% !important;
+    height: 120px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1rem !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Hover effect */
+.course-navigation .btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Icon styling */
+.course-navigation .btn i {
+    margin-bottom: 0.5rem !important;
+    font-size: 1.5rem !important;
+}
+
+/* Button colors */
+.course-navigation .btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+.course-navigation .btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    color: white !important;
+}
+
+.course-navigation .btn-info {
+    background: linear-gradient(135deg, #17a2b8, #138496) !important;
+    color: white !important;
+}
+
+.course-navigation .btn-warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+    color: #212529 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .course-navigation .d-flex {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    
+    .course-navigation .col-md-2 {
+        width: 100% !important;
+        max-width: 300px !important;
+    }
+    
+    .course-navigation .btn {
+        height: 100px !important;
+    }
+}

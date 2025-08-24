@@ -7,22 +7,22 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="mb-0">
                     <i class="fas fa-book-open me-2"></i>Manage Lessons
                 </h2>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLessonModal">
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLessonModal">
                     <i class="fas fa-plus me-1"></i>Add New Lesson
                 </button>
             </div>
 
             <!-- Course Filter -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row g-3">
+            <div class="card mb-3">
+                <div class="card-body p-3">
+                    <div class="row g-2">
                         <div class="col-12 col-md-6">
-                            <label for="courseFilter" class="form-label">Filter by Course:</label>
-                            <select id="courseFilter" class="form-select" onchange="filterLessons()">
+                            <label for="courseFilter" class="form-label small">Filter by Course:</label>
+                            <select id="courseFilter" class="form-select form-select-sm" onchange="filterLessons()">
                                 <option value="">All Courses</option>
                                 @foreach (var course in Model.Courses)
                                 {
@@ -31,8 +31,8 @@
                             </select>
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="lessonTypeFilter" class="form-label">Filter by Type:</label>
-                            <select id="lessonTypeFilter" class="form-select" onchange="filterLessons()">
+                            <label for="lessonTypeFilter" class="form-label small">Filter by Type:</label>
+                            <select id="lessonTypeFilter" class="form-select form-select-sm" onchange="filterLessons()">
                                 <option value="">All Types</option>
                                 <option value="Video">Video</option>
                                 <option value="Article">Article</option>
@@ -47,14 +47,14 @@
 
             <!-- Lessons Table -->
             <div class="card">
-                <div class="card-body">
+                <div class="card-body p-3">
                     @if (!Model.Lessons.Any())
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                            <h4>No lessons yet</h4>
+                        <div class="text-center py-4">
+                            <i class="fas fa-book-open fa-2x text-muted mb-2"></i>
+                            <h5>No lessons yet</h5>
                             <p class="text-muted">Create your first lesson to get started.</p>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLessonModal">
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addLessonModal">
                                 <i class="fas fa-plus me-1"></i>Add First Lesson
                             </button>
                         </div>
@@ -62,14 +62,14 @@
                     else
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover table-sm">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Title</th>
                                         <th>Course</th>
                                         <th>Type</th>
                                         <th>Duration</th>
-                                        <th>Sort Order</th>
+                                        <th>Order</th>
                                         <th>Preview</th>
                                         <th>Actions</th>
                                     </tr>
@@ -83,38 +83,37 @@
                                                 @if (!string.IsNullOrEmpty(lesson.Description))
                                                 {
                                                     <br>
-                                        
-                                                    <small class="text-muted">@(lesson.Description.Length > 50 ? lesson.Description.Substring(0, 50) + "..." : lesson.Description)</small>
+                                                    <small class="text-muted">@(lesson.Description.Length > 40 ? lesson.Description.Substring(0, 40) + "..." : lesson.Description)</small>
                                                 }
-                                        </td>
-                                        <td>@(lesson.Course?.Title ?? "Unknown Course")</td>
-                                        <td>
-                                            <span class="badge bg-secondary">@lesson.LessonType</span>
-                                        </td>
-                                        <td>@(lesson.Duration?.ToString() ?? "N/A") min</td>
-                                        <td>@lesson.SortOrder</td>
+                                            </td>
+                                            <td>@(lesson.Course?.Title ?? "Unknown")</td>
+                                            <td>
+                                                <span class="badge bg-secondary small">@lesson.LessonType</span>
+                                            </td>
+                                            <td>@(lesson.Duration?.ToString() ?? "N/A") min</td>
+                                            <td>@lesson.SortOrder</td>
                                             <td>
                                                 @if (lesson.IsPreview == true)
                                                 {
-                                                    <span class="badge bg-warning text-dark">Preview</span>
+                                                    <span class="badge bg-warning text-dark small">Preview</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-secondary">Locked</span>
+                                                    <span class="badge bg-secondary small">Locked</span>
                                                 }
                                             </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <button class="btn btn-outline-primary" onclick="editLesson(@lesson.LessonId)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-danger" onclick="deleteLesson(@lesson.LessonId)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                                                }
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button class="btn btn-outline-primary btn-sm" onclick="editLesson(@lesson.LessonId)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLesson(@lesson.LessonId)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -125,92 +124,75 @@
     </div>
 </div>
 
-<!-- Add Lesson Modal -->
+<!-- Compact Add Lesson Modal -->
 <div class="modal fade" id="addLessonModal" tabindex="-1" aria-labelledby="addLessonModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addLessonModalLabel">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" id="addLessonModalLabel">
                     <i class="fas fa-plus me-2"></i>Add New Lesson
-                </h5>
+                </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" asp-page-handler="AddLesson" id="addLessonForm" novalidate>
                 @Html.AntiForgeryToken()
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <div class="mb-3">
-                                <label for="courseId" class="form-label">Course <span class="text-danger">*</span></label>
-                                <select class="form-select" id="courseId" name="CourseId" required>
-                                    <option value="">Select Course</option>
-                                    @foreach (var course in Model.Courses)
-                                    {
-                                        <option value="@course.CourseId">@course.Title</option>
-                                    }
-                                </select>
-                                <div class="invalid-feedback">Please select a course.</div>
-                            </div>
+                <div class="modal-body p-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small">Course </label>
+                            <select class="form-select form-select-sm" id="courseId" name="CourseId" required>
+                                <option value="">Select Course</option>
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <option value="@course.CourseId">@course.Title</option>
+                                }
+                            </select>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="mb-3">
-                                <label for="lessonType" class="form-label">Lesson Type <span class="text-danger">*</span></label>
-                                <select class="form-select" id="lessonType" name="LessonType" required>
-                                    <option value="">Select Type</option>
-                                    <option value="Video">Video</option>
-                                    <option value="Article">Article</option>
-                                    <option value="Quiz">Quiz</option>
-                                    <option value="Assignment">Assignment</option>
-                                    <option value="Download">Download</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a lesson type.</div>
+                        <div class="col-6">
+                            <label class="form-label small">Type </label>
+                            <select class="form-select form-select-sm" id="lessonType" name="LessonType" required>
+                                <option value="">Select Type</option>
+                                <option value="Video">Video</option>
+                                <option value="Article">Article</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment">Assignment</option>
+                                <option value="Download">Download</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label for="title" class="form-label small">Title </label>
+                        <input type="text" class="form-control form-control-sm" id="title" name="Title" required>
+                    </div>
+                    <div class="mt-2">
+                        <label for="description" class="form-label small">Description</label>
+                        <textarea class="form-control form-control-sm" id="description" name="Description" rows="2"></textarea>
+                    </div>
+                    <div class="row g-2 mt-1">
+                        <div class="col-4">
+                            <label for="duration" class="form-label small">Duration (min)</label>
+                            <input type="number" class="form-control form-control-sm" id="duration" name="Duration" min="1">
+                        </div>
+                        <div class="col-4">
+                            <label for="sortOrder" class="form-label small">Order </label>
+                            <input type="number" class="form-control form-control-sm" id="sortOrder" name="SortOrder" value="1" min="1" required>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="isPreview" name="IsPreview" value="true">
+                                <label class="form-check-label small" for="isPreview">Preview</label>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="title" name="Title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="Description" rows="3"></textarea>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="duration" class="form-label">Duration (minutes)</label>
-                                <input type="number" class="form-control" id="duration" name="Duration" min="1">
-                                <small class="text-muted">Optional - estimated time to complete</small>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="sortOrder" class="form-label">Sort Order <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="sortOrder" name="SortOrder" value="1" min="1" required>
-                                <div class="invalid-feedback">Please enter a valid sort order.</div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="contentUrl" class="form-label">Content URL</label>
-                                <input type="url" class="form-control" id="contentUrl" name="ContentUrl">
-                                <small class="text-muted">Optional - link to video/document</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isPreview" name="IsPreview" value="true">
-                            <label class="form-check-label" for="isPreview">
-                                Available as Preview
-                            </label>
-                        </div>
+                    <div class="mt-2">
+                        <label for="contentUrl" class="form-label small">Content URL</label>
+                        <input type="url" class="form-control form-control-sm" id="contentUrl" name="ContentUrl">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="saveLessonBtn">
-                        <i class="fas fa-save me-1"></i>Save Lesson
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="saveLessonBtn">
+                        <i class="fas fa-save me-1"></i>Save
                     </button>
                 </div>
             </form>
@@ -218,93 +200,76 @@
     </div>
 </div>
 
-<!-- Edit Lesson Modal -->
+<!-- Compact Edit Lesson Modal -->
 <div class="modal fade" id="editLessonModal" tabindex="-1" aria-labelledby="editLessonModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editLessonModalLabel">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" id="editLessonModalLabel">
                     <i class="fas fa-edit me-2"></i>Edit Lesson
-                </h5>
+                </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post" asp-page-handler="UpdateLesson" id="editLessonForm" novalidate>
                 @Html.AntiForgeryToken()
                 <input type="hidden" id="editLessonId" name="LessonId" />
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6">
-                            <div class="mb-3">
-                                <label for="editCourseId" class="form-label">Course <span class="text-danger">*</span></label>
-                                <select class="form-select" id="editCourseId" name="CourseId" required>
-                                    <option value="">Select Course</option>
-                                    @foreach (var course in Model.Courses)
-                                    {
-                                        <option value="@course.CourseId">@course.Title</option>
-                                    }
-                                </select>
-                                <div class="invalid-feedback">Please select a course.</div>
-                            </div>
+                <div class="modal-body p-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label small">Course </label>
+                            <select class="form-select form-select-sm" id="editCourseId" name="CourseId" required>
+                                <option value="">Select Course</option>
+                                @foreach (var course in Model.Courses)
+                                {
+                                    <option value="@course.CourseId">@course.Title</option>
+                                }
+                            </select>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="mb-3">
-                                <label for="editLessonType" class="form-label">Lesson Type <span class="text-danger">*</span></label>
-                                <select class="form-select" id="editLessonType" name="LessonType" required>
-                                    <option value="">Select Type</option>
-                                    <option value="Video">Video</option>
-                                    <option value="Article">Article</option>
-                                    <option value="Quiz">Quiz</option>
-                                    <option value="Assignment">Assignment</option>
-                                    <option value="Download">Download</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a lesson type.</div>
+                        <div class="col-6">
+                            <label class="form-label small">Type </label>
+                            <select class="form-select form-select-sm" id="editLessonType" name="LessonType" required>
+                                <option value="">Select Type</option>
+                                <option value="Video">Video</option>
+                                <option value="Article">Article</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment">Assignment</option>
+                                <option value="Download">Download</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label for="editTitle" class="form-label small">Title </label>
+                        <input type="text" class="form-control form-control-sm" id="editTitle" name="Title" required>
+                    </div>
+                    <div class="mt-2">
+                        <label for="editDescription" class="form-label small">Description</label>
+                        <textarea class="form-control form-control-sm" id="editDescription" name="Description" rows="2"></textarea>
+                    </div>
+                    <div class="row g-2 mt-1">
+                        <div class="col-4">
+                            <label for="editDuration" class="form-label small">Duration (min)</label>
+                            <input type="number" class="form-control form-control-sm" id="editDuration" name="Duration" min="1">
+                        </div>
+                        <div class="col-4">
+                            <label for="editSortOrder" class="form-label small">Order</label>
+                            <input type="number" class="form-control form-control-sm" id="editSortOrder" name="SortOrder" min="1" required>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="editIsPreview" name="IsPreview" value="true">
+                                <label class="form-check-label small" for="editIsPreview">Preview</label>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="editTitle" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="editTitle" name="Title" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="editDescription" name="Description" rows="3"></textarea>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="editDuration" class="form-label">Duration (minutes)</label>
-                                <input type="number" class="form-control" id="editDuration" name="Duration" min="1">
-                                <small class="text-muted">Optional - estimated time to complete</small>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="editSortOrder" class="form-label">Sort Order <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="editSortOrder" name="SortOrder" min="1" required>
-                                <div class="invalid-feedback">Please enter a valid sort order.</div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="mb-3">
-                                <label for="editContentUrl" class="form-label">Content URL</label>
-                                <input type="url" class="form-control" id="editContentUrl" name="ContentUrl">
-                                <small class="text-muted">Optional - link to video/document</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="editIsPreview" name="IsPreview" value="true">
-                            <label class="form-check-label" for="editIsPreview">
-                                Available as Preview
-                            </label>
-                        </div>
+                    <div class="mt-2">
+                        <label for="editContentUrl" class="form-label small">Content URL</label>
+                        <input type="url" class="form-control form-control-sm" id="editContentUrl" name="ContentUrl">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="updateLessonBtn">
-                        <i class="fas fa-save me-1"></i>Update Lesson
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="updateLessonBtn">
+                        <i class="fas fa-save me-1"></i>Update
                     </button>
                 </div>
             </form>
@@ -312,210 +277,197 @@
     </div>
 </div>
 
+<style>
+    .table-sm th, .table-sm td {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
 
+    .badge.small {
+        font-size: 0.7rem;
+    }
 
-@section Scripts {
-    <script>
-        // Ensure Bootstrap is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if Bootstrap is available
-            if (typeof bootstrap === 'undefined') {
-                console.error('Bootstrap is not loaded!');
-                return;
-            }
-            
-            console.log('Bootstrap loaded successfully');
-        });
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
 
-        function filterLessons() {
-            const courseFilter = document.getElementById('courseFilter').value;
-            const typeFilter = document.getElementById('lessonTypeFilter').value;
-            const rows = document.querySelectorAll('tbody tr');
+    .form-select-sm, .form-control-sm {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
 
-            rows.forEach(row => {
-                const courseId = row.getAttribute('data-course-id');
-                const lessonType = row.getAttribute('data-lesson-type');
+    .form-label.small {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
 
-                const courseMatch = !courseFilter || courseId === courseFilter;
-                const typeMatch = !typeFilter || lessonType === typeFilter;
+    .modal-dialog {
+        max-width: 600px;
+    }
 
-                if (courseMatch && typeMatch) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded!');
+            return;
         }
+        console.log('Bootstrap loaded successfully');
+    });
 
-        function editLesson(lessonId) {
-            console.log(`Fetching lesson ID: ${lessonId}`);
-            fetch(`/Admin/Lessons?handler=Lesson&id=${lessonId}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => {
-                console.log(`Response status: ${response.status}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Received lesson data:', data);
-                // Populate form fields
-                document.getElementById('editLessonId').value = data.lessonId || '';
-                document.getElementById('editCourseId').value = data.courseId || '';
-                document.getElementById('editTitle').value = data.title || '';
-                document.getElementById('editDescription').value = data.description || '';
-                document.getElementById('editLessonType').value = data.lessonType || '';
-                document.getElementById('editDuration').value = data.duration || '';
-                document.getElementById('editSortOrder').value = data.sortOrder || '';
-                document.getElementById('editContentUrl').value = data.contentUrl || '';
-                document.getElementById('editIsPreview').checked = data.isPreview ?? false;
+    function filterLessons() {
+        const courseFilter = document.getElementById('courseFilter').value;
+        const typeFilter = document.getElementById('lessonTypeFilter').value;
+        const rows = document.querySelectorAll('tbody tr');
 
-                // Show the modal
-                const modalElement = document.getElementById('editLessonModal');
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
-                
-                // Force enable all form elements
-                setTimeout(() => {
-                    enableModalElements(modalElement);
-                }, 100);
-            })
-            .catch(error => {
-                console.error('Error fetching lesson data:', error);
-                // Display error in UI
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger mt-3';
-                errorDiv.textContent = `Failed to load lesson ${lessonId}. Please try again or check the console.`;
-                document.querySelector('.container').prepend(errorDiv);
-            });
-        }
+        rows.forEach(row => {
+            const courseId = row.getAttribute('data-course-id');
+            const lessonType = row.getAttribute('data-lesson-type');
 
-        function deleteLesson(lessonId) {
-            if (confirm('Are you sure you want to delete this lesson?')) {
-                var form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '?handler=DeleteLesson&lessonId=' + lessonId;
+            const courseMatch = !courseFilter || courseId === courseFilter;
+            const typeMatch = !typeFilter || lessonType === typeFilter;
 
-                var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                var tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = '__RequestVerificationToken';
-                tokenInput.value = token;
-                form.appendChild(tokenInput);
-
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-
-        // Form validation for Add Lesson
-        document.getElementById('addLessonForm').addEventListener('submit', function(event) {
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            this.classList.add('was-validated');
-
-            if (this.checkValidity()) {
-                const saveBtn = document.getElementById('saveLessonBtn');
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
-            }
-        });
-
-        // Form validation for Edit Lesson
-        document.getElementById('editLessonForm').addEventListener('submit', function(event) {
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            this.classList.add('was-validated');
-
-            if (this.checkValidity()) {
-                const updateBtn = document.getElementById('updateLessonBtn');
-                updateBtn.disabled = true;
-                updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Updating...';
-            }
-        });
-
-        // Reset forms when modals are closed
-        document.getElementById('addLessonModal').addEventListener('hidden.bs.modal', function() {
-            const form = document.getElementById('addLessonForm');
-            form.reset();
-            form.classList.remove('was-validated');
-            const saveBtn = document.getElementById('saveLessonBtn');
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save Lesson';
-        });
-
-        document.getElementById('editLessonModal').addEventListener('hidden.bs.modal', function() {
-            const form = document.getElementById('editLessonForm');
-            form.reset();
-            form.classList.remove('was-validated');
-            const updateBtn = document.getElementById('updateLessonBtn');
-            updateBtn.disabled = false;
-            updateBtn.innerHTML = '<i class="fas fa-save me-1"></i>Update Lesson';
-        });
-
-        // Manual modal trigger for testing
-        function showAddModal() {
-            const modalElement = document.getElementById('addLessonModal');
-            
-            if (typeof bootstrap !== 'undefined') {
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
+            if (courseMatch && typeMatch) {
+                row.style.display = '';
             } else {
-                console.error('Bootstrap not available');
-                // Fallback: show modal manually
-                modalElement.style.display = 'block';
-                modalElement.classList.add('show');
-                document.body.classList.add('modal-open');
-                
-                // Add backdrop
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop show';
-                document.body.appendChild(backdrop);
+                row.style.display = 'none';
             }
-            
-            // Force enable all form elements
+        });
+    }
+
+    function editLesson(lessonId) {
+        console.log(`Fetching lesson ID: ${lessonId}`);
+        fetch(`/Admin/Lessons?handler=Lesson&id=${lessonId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log(`Response status: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received lesson data:', data);
+            document.getElementById('editLessonId').value = data.lessonId || '';
+            document.getElementById('editCourseId').value = data.courseId || '';
+            document.getElementById('editTitle').value = data.title || '';
+            document.getElementById('editDescription').value = data.description || '';
+            document.getElementById('editLessonType').value = data.lessonType || '';
+            document.getElementById('editDuration').value = data.duration || '';
+            document.getElementById('editSortOrder').value = data.sortOrder || '';
+            document.getElementById('editContentUrl').value = data.contentUrl || '';
+            document.getElementById('editIsPreview').checked = data.isPreview ?? false;
+
+            const modalElement = document.getElementById('editLessonModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
             setTimeout(() => {
                 enableModalElements(modalElement);
             }, 100);
+        })
+        .catch(error => {
+            console.error('Error fetching lesson data:', error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger mt-3';
+            errorDiv.textContent = `Failed to load lesson ${lessonId}. Please try again.`;
+            document.querySelector('.container').prepend(errorDiv);
+        });
+    }
+
+    function deleteLesson(lessonId) {
+        if (confirm('Are you sure you want to delete this lesson?')) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '?handler=DeleteLesson&lessonId=' + lessonId;
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token;
+            form.appendChild(tokenInput);
+
+            document.body.appendChild(form);
+            form.submit();
         }
-        
-        function enableModalElements(modal) {
-            // Remove any disabled attributes
-            const elements = modal.querySelectorAll('input, select, textarea, button');
-            elements.forEach(element => {
-                element.removeAttribute('disabled');
-                element.style.pointerEvents = 'auto';
-                element.style.userSelect = 'auto';
-            });
-            
-            // Ensure modal content is interactive
-            modal.style.pointerEvents = 'auto';
-            const modalContent = modal.querySelector('.modal-content');
-            if (modalContent) {
-                modalContent.style.pointerEvents = 'auto';
-            }
+    }
+
+    // Form validation for Add Lesson
+    document.getElementById('addLessonForm').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
         }
 
-        // Override button click to use manual trigger
-        document.addEventListener('DOMContentLoaded', function() {
-            const addButtons = document.querySelectorAll('[data-bs-toggle="modal"][data-bs-target="#addLessonModal"]');
-            addButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showAddModal();
-                });
-            });
+        this.classList.add('was-validated');
+
+        if (this.checkValidity()) {
+            const saveBtn = document.getElementById('saveLessonBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+        }
+    });
+
+    // Form validation for Edit Lesson
+    document.getElementById('editLessonForm').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        this.classList.add('was-validated');
+
+        if (this.checkValidity()) {
+            const updateBtn = document.getElementById('updateLessonBtn');
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Updating...';
+        }
+    });
+
+    // Reset forms when modals are closed
+    document.getElementById('addLessonModal').addEventListener('hidden.bs.modal', function() {
+        const form = document.getElementById('addLessonForm');
+        form.reset();
+        form.classList.remove('was-validated');
+        const saveBtn = document.getElementById('saveLessonBtn');
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save me-1"></i>Save';
+    });
+
+    document.getElementById('editLessonModal').addEventListener('hidden.bs.modal', function() {
+        const form = document.getElementById('editLessonForm');
+        form.reset();
+        form.classList.remove('was-validated');
+        const updateBtn = document.getElementById('updateLessonBtn');
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = '<i class="fas fa-save me-1"></i>Update';
+    });
+
+    function enableModalElements(modal) {
+        const elements = modal.querySelectorAll('input, select, textarea, button');
+        elements.forEach(element => {
+            element.removeAttribute('disabled');
+            element.style.pointerEvents = 'auto';
+            element.style.userSelect = 'auto';
         });
-    </script>
-}
+
+        modal.style.pointerEvents = 'auto';
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.style.pointerEvents = 'auto';
+        }
+    }
+</script>

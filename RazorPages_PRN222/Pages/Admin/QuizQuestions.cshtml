@@ -7,7 +7,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <h2 class="mb-0">
                         <i class="fas fa-question-circle me-2"></i>Quiz Questions
@@ -15,29 +15,29 @@
                     <p class="text-muted mb-0">@Model.Quiz?.Title</p>
                 </div>
                 <div>
-                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                    <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
                         <i class="fas fa-plus me-1"></i>Add Question
                     </button>
-                    <a asp-page="/Admin/Quizzes" class="btn btn-secondary">
+                    <a asp-page="/Admin/Quizzes" class="btn btn-secondary btn-sm">
                         <i class="fas fa-arrow-left me-1"></i>Back to Quizzes
                     </a>
                 </div>
             </div>
 
             <!-- Quiz Info -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body p-3">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-3">
                             <strong>Time Limit:</strong> @(Model.Quiz?.TimeLimit?.ToString() ?? "No limit") min
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-3">
                             <strong>Pass Score:</strong> @(Model.Quiz?.PassingScore?.ToString() ?? "N/A")%
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-3">
                             <strong>Max Attempts:</strong> @(Model.Quiz?.MaxAttempts?.ToString() ?? "Unlimited")
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-12 col-md-3">
                             <strong>Questions:</strong> @Model.Questions.Count
                         </div>
                     </div>
@@ -46,14 +46,14 @@
 
             <!-- Questions List -->
             <div class="card">
-                <div class="card-body">
+                <div class="card-body p-3">
                     @if (!Model.Questions.Any())
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
-                            <h4>No questions yet</h4>
+                        <div class="text-center py-4">
+                            <i class="fas fa-question-circle fa-2x text-muted mb-2"></i>
+                            <h5>No questions yet</h5>
                             <p class="text-muted">Add your first question to get started.</p>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
                                 <i class="fas fa-plus me-1"></i>Add First Question
                             </button>
                         </div>
@@ -65,35 +65,21 @@
                             {
                                 var question = Model.Questions[i];
                                 <div class="card mb-3 question-card">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0">Question @(i + 1)</h5>
+                                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                        <h6 class="mb-0">Question @(i + 1)</h6>
                                         <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" onclick="editQuestion(@question.QuestionId)">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="editQuestion(@question.QuestionId)">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-outline-danger" onclick="deleteQuestion(@question.QuestionId)">
+                                            <button class="btn btn-outline-danger btn-sm" onclick="deleteQuestion(@question.QuestionId)">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="card-body">
                                         <p class="question-text"><strong>@question.QuestionText</strong></p>
-                                        
-                                        @if (question.QuestionType == "Multiple Choice")
-                                        {
-                                            <div class="answers-list">
-                                                @foreach (var answer in question.QuizAnswers.OrderBy(a => a.SortOrder))
-                                                {
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="radio" disabled @(answer.IsCorrect == true ? "checked" : "")>
-                                                        <label class="form-check-label @(answer.IsCorrect == true ? "text-success fw-bold" : "")">
-                                                            @answer.AnswerText
-                                                        </label>
-                                                    </div>
-                                                }
-                                            </div>
-                                        }
-                                        else if (question.QuestionType == "True/False")
+
+                                        @if (question.QuestionType == "Multiple Choice" || question.QuestionType == "True/False")
                                         {
                                             <div class="answers-list">
                                                 @foreach (var answer in question.QuizAnswers.OrderBy(a => a.SortOrder))
@@ -111,14 +97,14 @@
                                         {
                                             <p class="text-muted">Text/Short Answer Question</p>
                                         }
-                                        
-                                                                                 <div class="mt-3">
-                                             <small class="text-muted">
-                                                 <strong>Type:</strong> @question.QuestionType | 
-                                                 <strong>Points:</strong> @(question.Points ?? 1) | 
-                                                 <strong>Sort Order:</strong> @question.SortOrder
-                                             </small>
-                                         </div>
+
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <strong>Type:</strong> @question.QuestionType |
+                                                <strong>Points:</strong> @(question.Points ?? 1) |
+                                                <strong>Sort Order:</strong> @question.SortOrder
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -132,66 +118,58 @@
 
 <!-- Add Question Modal -->
 <div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addQuestionModalLabel">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" id="addQuestionModalLabel">
                     <i class="fas fa-plus me-2"></i>Add New Question
-                </h5>
+                </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-                         <form method="post" asp-page-handler="AddQuestion" id="addQuestionForm" novalidate>
-                 @Html.AntiForgeryToken()
-                <div class="modal-body">
-                                                              <div class="row g-3">
-                         <div class="col-12 col-md-6">
-                             <div class="mb-3">
-                                 <label for="questionType" class="form-label">Question Type <span class="text-danger">*</span></label>
-                                 <select class="form-select" id="questionType" name="QuestionType" onchange="toggleAnswerFields()" required>
-                                     <option value="">Select Type</option>
-                                     <option value="Multiple Choice">Multiple Choice</option>
-                                     <option value="True/False">True/False</option>
-                                     <option value="Short Answer">Short Answer</option>
-                                 </select>
-                                 <div class="invalid-feedback">Please select a question type.</div>
-                             </div>
-                         </div>
-                         <div class="col-12 col-md-6">
-                             <div class="mb-3">
-                                 <label for="points" class="form-label">Points <span class="text-danger">*</span></label>
-                                 <input type="number" class="form-control" id="points" name="Points" value="1" min="1" required>
-                                 <div class="invalid-feedback">Please enter valid points.</div>
-                             </div>
-                         </div>
-                     </div>
-                     <div class="mb-3">
-                         <label for="questionText" class="form-label">Question Text <span class="text-danger">*</span></label>
-                         <textarea class="form-control" id="questionText" name="QuestionText" rows="3" required></textarea>
-                         <div class="invalid-feedback">Please enter the question text.</div>
-                     </div>
-                    
-                                         <!-- Answer Fields (for Multiple Choice and True/False) -->
-                     <div id="answerFields" style="display: none;">
-                         <h6 class="mb-3">
-                             <i class="fas fa-list me-2"></i>Answers
-                             <small class="text-muted">(Select the correct answer)</small>
-                         </h6>
-                         <div id="answersList">
-                             <!-- Dynamic answer fields will be added here -->
-                         </div>
-                         <div class="mt-3">
-                             <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addAnswerField()">
-                                 <i class="fas fa-plus me-1"></i>Add Answer
-                             </button>
-                             <small class="text-muted ms-2">Minimum 2 answers required for Multiple Choice questions</small>
-                         </div>
-                     </div>
+            <form method="post" asp-page-handler="AddQuestion" id="addQuestionForm" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-3">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small">Question Type <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" id="questionType" name="QuestionType" onchange="toggleAnswerFields()" required>
+                                <option value="">Select Type</option>
+                                <option value="Multiple Choice">Multiple Choice</option>
+                                <option value="True/False">True/False</option>
+                                <option value="Short Answer">Short Answer</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a question type.</div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small">Points <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control form-control-sm" id="points" name="Points" value="1" min="1" required>
+                            <div class="invalid-feedback">Please enter valid points.</div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label small">Question Text <span class="text-danger">*</span></label>
+                        <textarea class="form-control form-control-sm" id="questionText" name="QuestionText" rows="2" required></textarea>
+                        <div class="invalid-feedback">Please enter the question text.</div>
+                    </div>
+                    <div id="answerFields" style="display: none;" class="mt-2">
+                        <h6 class="mb-2">
+                            <i class="fas fa-list me-2"></i>Answers
+                            <small class="text-muted">(Select the correct answer)</small>
+                        </h6>
+                        <div id="answersList"></div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addAnswerField()">
+                                <i class="fas fa-plus me-1"></i>Add Answer
+                            </button>
+                            <small class="text-muted ms-2">Minimum 2 answers required for Multiple Choice questions</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                         <button type="submit" class="btn btn-primary" id="saveQuestionBtn">
-                         <i class="fas fa-save me-1"></i>Save Question
-                     </button>
+                <div class="modal-footer py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="saveQuestionBtn">
+                        <i class="fas fa-save me-1"></i>Save
+                    </button>
                 </div>
             </form>
         </div>
@@ -199,197 +177,197 @@
 </div>
 
 <style>
-.question-card {
-    border-left: 4px solid #007bff;
-}
-
-.question-text {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
-.answers-list {
-    margin-left: 1rem;
-}
-
-.form-check {
-    margin-bottom: 0.5rem;
-}
-
-.btn-group-sm .btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.form-label .text-danger {
-    font-size: 0.875rem;
-}
-
-.invalid-feedback {
-    font-size: 0.875rem;
-}
-
-.text-muted {
-    font-size: 0.875rem;
-}
-
-/* Responsive improvements */
-@@media (max-width: 768px) {
-    .btn-group-sm .btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 1rem;
+    .table-sm th, .table-sm td {
+        padding: 0.5rem;
+        font-size: 0.875rem;
     }
-    
+
+    .badge.small {
+        font-size: 0.7rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .form-select-sm, .form-control-sm {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .form-label.small {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .modal-dialog {
+        max-width: 600px;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .invalid-feedback {
+        font-size: 0.8rem;
+    }
+
+    .text-muted {
+        font-size: 0.8rem;
+    }
+
+    .question-card {
+        border-left: 4px solid #007bff;
+    }
+
     .question-text {
-        font-size: 1rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
     }
-}
 
-/* Loading state */
-.btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
-}
+    .answers-list {
+        margin-left: 1rem;
+    }
 
-/* Answer fields styling */
-#answerFields {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 0.375rem;
-    border: 1px solid #dee2e6;
-}
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
 
-#answersList .row {
-    background-color: white;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
-    border: 1px solid #e9ecef;
-}
+    #answerFields {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+    }
+
+    #answersList .row {
+        background-color: white;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #e9ecef;
+        margin-bottom: 0.5rem;
+    }
 </style>
 
 <script>
-let answerCounter = 0;
+    let answerCounter = 0;
 
-function toggleAnswerFields() {
-    const questionType = document.getElementById('questionType').value;
-    const answerFields = document.getElementById('answerFields');
-    const answersList = document.getElementById('answersList');
-    
-    if (questionType === 'Multiple Choice' || questionType === 'True/False') {
-        answerFields.style.display = 'block';
-        answersList.innerHTML = '';
-        answerCounter = 0;
-        
-        if (questionType === 'True/False') {
-            addAnswerField('True');
-            addAnswerField('False');
+    function toggleAnswerFields() {
+        const questionType = document.getElementById('questionType').value;
+        const answerFields = document.getElementById('answerFields');
+        const answersList = document.getElementById('answersList');
+
+        if (questionType === 'Multiple Choice' || questionType === 'True/False') {
+            answerFields.style.display = 'block';
+            answersList.innerHTML = '';
+            answerCounter = 0;
+
+            if (questionType === 'True/False') {
+                addAnswerField('True');
+                addAnswerField('False');
+            } else {
+                addAnswerField();
+                addAnswerField();
+            }
         } else {
-            addAnswerField();
-            addAnswerField();
+            answerFields.style.display = 'none';
         }
-    } else {
-        answerFields.style.display = 'none';
     }
-}
 
-function addAnswerField(defaultText = '') {
-    answerCounter++;
-    const answersList = document.getElementById('answersList');
-    const questionType = document.getElementById('questionType').value;
-    
-    const answerDiv = document.createElement('div');
-    answerDiv.className = 'row g-2 mb-3 align-items-center';
-    answerDiv.innerHTML = `
-        <div class="col-12 col-md-7">
-            <input type="text" class="form-control" name="AnswerText[]" value="${defaultText}" placeholder="Answer text" required>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="CorrectAnswer" value="${answerCounter - 1}" ${answerCounter === 1 ? 'checked' : ''}>
-                <label class="form-check-label">Correct Answer</label>
+    function addAnswerField(defaultText = '') {
+        answerCounter++;
+        const answersList = document.getElementById('answersList');
+        const questionType = document.getElementById('questionType').value;
+
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'row g-2 mb-3 align-items-center';
+        answerDiv.innerHTML = `
+            <div class="col-12 col-md-7">
+                <input type="text" class="form-control form-control-sm" name="AnswerText[]" value="${defaultText}" placeholder="Answer text" required>
             </div>
-        </div>
-        <div class="col-12 col-md-2 text-end">
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeAnswerField(this)" title="Remove Answer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    answersList.appendChild(answerDiv);
-}
+            <div class="col-12 col-md-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="CorrectAnswer" value="${answerCounter - 1}" ${answerCounter === 1 ? 'checked' : ''}>
+                    <label class="form-check-label small">Correct Answer</label>
+                </div>
+            </div>
+            <div class="col-12 col-md-2 text-end">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeAnswerField(this)" title="Remove Answer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
 
-function removeAnswerField(button) {
-    button.closest('.row').remove();
-}
-
-function editQuestion(questionId) {
-    // TODO: Implement edit functionality
-    alert('Edit question ' + questionId + ' - This would open an edit modal.');
-}
-
-function deleteQuestion(questionId) {
-    if (confirm('Are you sure you want to delete this question?')) {
-        // Create a form and submit it
-        var form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '?handler=DeleteQuestion&questionId=' + questionId;
-        
-        // Add antiforgery token
-        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-        var tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = '__RequestVerificationToken';
-        tokenInput.value = token;
-        form.appendChild(tokenInput);
-        
-        document.body.appendChild(form);
-        form.submit();
+        answersList.appendChild(answerDiv);
     }
-}
 
-// Form validation
-document.getElementById('addQuestionForm').addEventListener('submit', function(event) {
-    if (!this.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
+    function removeAnswerField(button) {
+        button.closest('.row').remove();
     }
-    
-    this.classList.add('was-validated');
-    
-    // Check if answers are provided for Multiple Choice and True/False questions
-    const questionType = document.getElementById('questionType').value;
-    if (questionType === 'Multiple Choice' || questionType === 'True/False') {
-        const answerFields = document.querySelectorAll('input[name="AnswerText[]"]');
-        const correctAnswer = document.querySelector('input[name="CorrectAnswer"]:checked');
-        
-        if (answerFields.length < 2) {
-            event.preventDefault();
-            alert('Please add at least 2 answer options for Multiple Choice questions.');
-            return;
-        }
-        
-        if (!correctAnswer) {
-            event.preventDefault();
-            alert('Please select the correct answer.');
-            return;
+
+    function editQuestion(questionId) {
+        alert('Edit question ' + questionId + ' - This would open an edit modal.');
+    }
+
+    function deleteQuestion(questionId) {
+        if (confirm('Are you sure you want to delete this question?')) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '?handler=DeleteQuestion&questionId=' + questionId;
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            var tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = '__RequestVerificationToken';
+            tokenInput.value = token;
+            form.appendChild(tokenInput);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
-    
-    // Show loading state
-    if (this.checkValidity()) {
-        const saveBtn = document.getElementById('saveQuestionBtn');
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
-    }
-});
 
-// Reset form when modal is closed
-document.getElementById('addQuestionModal').addEventListener('hidden.bs.modal', function() {
-    const form = document.getElementById('addQuestionForm');
-    form.reset();
-    form.classList.remove('was-validated');
-    document.getElementById('answerFields').style.display = 'none';
-    document.getElementById('answersList').innerHTML = '';
-});
+    document.getElementById('addQuestionForm').addEventListener('submit', function(event) {
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        this.classList.add('was-validated');
+
+        const questionType = document.getElementById('questionType').value;
+        if (questionType === 'Multiple Choice' || questionType === 'True/False') {
+            const answerFields = document.querySelectorAll('input[name="AnswerText[]"]');
+            const correctAnswer = document.querySelector('input[name="CorrectAnswer"]:checked');
+
+            if (answerFields.length < 2) {
+                event.preventDefault();
+                alert('Please add at least 2 answer options for Multiple Choice questions.');
+                return;
+            }
+
+            if (!correctAnswer) {
+                event.preventDefault();
+                alert('Please select the correct answer.');
+                return;
+            }
+        }
+
+        if (this.checkValidity()) {
+            const saveBtn = document.getElementById('saveQuestionBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+        }
+    });
+
+    document.getElementById('addQuestionModal').addEventListener('hidden.bs.modal', function() {
+        const form = document.getElementById('addQuestionForm');
+        form.reset();
+        form.classList.remove('was-validated');
+        document.getElementById('answerFields').style.display = 'none';
+        document.getElementById('answersList').innerHTML = '';
+    });
 </script>
